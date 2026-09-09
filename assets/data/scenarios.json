@@ -1,0 +1,332 @@
+[
+  {
+    "id": "sc_d1_001",
+    "domain": "Implement and manage user identities",
+    "title": "Delegating Regional Helpdesk Access",
+    "scenarioText": "Contoso has a single Microsoft Entra tenant covering offices in Chicago and Nairobi. The Nairobi office's local IT lead should be able to reset passwords and manage licenses for Nairobi-office users only, and must never be able to touch Chicago accounts or global tenant settings.",
+    "steps": null,
+    "question": "What is the correct way to configure this access?",
+    "options": [
+      "Create an Administrative Unit containing only Nairobi users, then assign the local IT lead a scoped Helpdesk Administrator (or similar) role at that Administrative Unit",
+      "Assign the local IT lead the Global Administrator role and trust them to only touch Nairobi accounts",
+      "Assign the local IT lead the User Administrator role tenant-wide, since there is no way to restrict a built-in role's scope",
+      "Create a security group of Nairobi users and assign the local IT lead as group owner, which automatically grants password reset rights"
+    ],
+    "correctIndex": 0,
+    "explanation": "Administrative units let you scope built-in (or custom) Entra roles to a defined subset of users, groups, or devices, which is exactly the least-privilege boundary needed here. Global Administrator (B) is wildly over-scoped and violates least privilege. A tenant-wide User Administrator assignment (C) is incorrect because built-in roles CAN be scoped via administrative units — that's the whole point of the feature. Group ownership (D) does not by itself grant directory-wide permissions like password reset; role assignment is required."
+  },
+  {
+    "id": "sc_d1_002",
+    "domain": "Implement and manage user identities",
+    "title": "Tracking Cost Center Without Exposing It as a Directory Attribute",
+    "scenarioText": "Contoso's finance team wants every user tagged with a cost-center code that can be used to scope access packages and Conditional Access-adjacent automation, but they don't want this value editable by helpdesk staff who manage general user attributes.",
+    "steps": null,
+    "question": "Which Entra capability best fits this requirement?",
+    "options": [
+      "Custom security attributes, since they are managed through a separate Attribute Definition Administrator / Attribute Assignment Administrator role split from general user management",
+      "The built-in 'department' attribute, since it's already editable by any User Administrator",
+      "A dynamic group's membership rule name, since group names can store arbitrary metadata",
+      "A custom domain suffix on the user's UPN encoding the cost center"
+    ],
+    "correctIndex": 0,
+    "explanation": "Custom security attributes are purpose-built for exactly this: they require a distinct set of roles (Attribute Definition Administrator to define them, Attribute Assignment Administrator to assign values) separate from general user administration, so helpdesk staff with ordinary User Administrator rights can't touch them. The built-in department field (B) is editable by general admin roles, defeating the separation requirement. A group name (C) isn't a per-user attribute and is a misuse of the field. Encoding data in the UPN (D) is not a supported or sane attribute strategy."
+  },
+  {
+    "id": "sc_d1_003",
+    "domain": "Implement and manage user identities",
+    "title": "Post-Merger Tenant-to-Tenant User Access",
+    "scenarioText": "Contoso acquires Fabrikam, which keeps its own separate Entra tenant during a transition period. Contoso needs a subset of Fabrikam employees to automatically get accounts provisioned in Contoso's tenant, kept in sync with their Fabrikam attributes, without every Fabrikam employee individually accepting a B2B invitation email.",
+    "steps": null,
+    "question": "What should be configured to meet this requirement?",
+    "options": [
+      "Cross-tenant synchronization from the Fabrikam tenant to the Contoso tenant, scoped to the relevant group of Fabrikam users",
+      "Manually send individual B2B collaboration invitations to each Fabrikam employee",
+      "Configure Microsoft Entra Connect Sync between the two tenants directly",
+      "Have Fabrikam employees self-register as external users through a public sign-up page"
+    ],
+    "correctIndex": 0,
+    "explanation": "Cross-tenant synchronization automates provisioning, updating, and deprovisioning of B2B users from a source tenant to a target tenant on an ongoing basis, scoped by group — exactly the 'no manual per-user invite' requirement here. Manual invitations (B) is the very process the automation is meant to replace. Entra Connect Sync (C) syncs an on-prem AD DS to a single Entra tenant, not tenant-to-tenant. Self-registration (D) doesn't give Contoso control over which Fabrikam users get provisioned."
+  },
+  {
+    "id": "sc_d1_004",
+    "domain": "Implement and manage user identities",
+    "title": "Choosing a Hybrid Authentication Method for Resilience",
+    "scenarioText": "Contoso currently uses Pass-through Authentication (PTA) for hybrid sign-in. During a recent on-prem network outage, all cloud sign-ins failed because none of the PTA agents could reach the on-prem domain controllers. Leadership now wants cloud sign-in to keep working even during on-prem outages, while still enforcing that a user's current AD password is what's checked.",
+    "steps": [
+      "Review current PTA agent placement and on-prem dependency",
+      "Evaluate Password Hash Synchronization as an alternative",
+      "Plan cutover and pilot with a test group",
+      "Enable seamless SSO alongside the new method to preserve the sign-in experience"
+    ],
+    "question": "Which change best addresses the resilience requirement?",
+    "options": [
+      "Switch to Password Hash Synchronization, which validates sign-ins against a synced hash in the cloud and does not depend on on-prem agents being reachable at sign-in time",
+      "Add more PTA agents to different subnets, since PTA's core design already tolerates full on-prem network outages",
+      "Disable hybrid identity entirely and require all users to have cloud-only accounts",
+      "Switch to AD FS, which removes the dependency on Entra Connect entirely"
+    ],
+    "correctIndex": 0,
+    "explanation": "Password Hash Synchronization checks a synchronized hash of the password directly in the cloud, so sign-in isn't blocked by an on-prem outage — it directly solves the stated failure mode. More PTA agents (B) improves PTA's own resilience somewhat but every agent still depends on reaching on-prem domain controllers, so a full on-prem outage still blocks sign-in. Going cloud-only (C) is a disproportionate, disruptive fix compared to a one-setting change. AD FS (D) adds an on-prem dependency (the federation servers) rather than removing one, making resilience worse, not better."
+  },
+  {
+    "id": "sc_d1_005",
+    "domain": "Implement and manage user identities",
+    "title": "Planning an AD FS Retirement",
+    "scenarioText": "Contoso has relied on AD FS for federated sign-in for years and wants to retire it in favor of Entra ID-native authentication, but leadership is nervous about a risky big-bang cutover affecting all 40,000 users at once.",
+    "steps": null,
+    "question": "What migration approach lets Contoso validate the new authentication method with a subset of users before full cutover?",
+    "options": [
+      "Use Microsoft Entra Connect's staged rollout feature to migrate specific pilot groups to cloud authentication while the rest of the tenant continues using AD FS",
+      "Immediately switch the whole tenant's federation settings from Federated to Managed in one change",
+      "Ask the pilot group of users to manually reconfigure their own sign-in method",
+      "Keep AD FS running indefinitely alongside cloud authentication with no formal migration path, since both can run forever without conflict"
+    ],
+    "correctIndex": 0,
+    "explanation": "Staged rollout lets an admin move specific security groups of users to Password Hash Sync or Pass-through Authentication (with seamless SSO) while the domain's federation setting is unchanged for everyone else, which is precisely the low-risk, incremental validation Contoso needs. An immediate full domain-level switch (B) is the big-bang cutover leadership wants to avoid. Users can't self-migrate their tenant-level authentication method (C) — that's an admin-configured setting. Running both indefinitely with no plan (D) isn't a migration strategy and leaves the AD FS retirement goal unmet."
+  },
+  {
+    "id": "sc_d2_001",
+    "domain": "Implement authentication and access management",
+    "title": "Onboarding a New Hire With No Existing Credential",
+    "scenarioText": "A new Contoso employee's first day is remote. IT needs to give them a way to register a passwordless authentication method (like Microsoft Authenticator) in Entra ID before they have ever signed in with a password, without shipping a hardware token.",
+    "steps": null,
+    "question": "Which authentication method is designed for exactly this bootstrap scenario?",
+    "options": [
+      "Temporary Access Pass (TAP), a time-limited passcode issued by an admin that lets the user sign in once to register a strong authentication method",
+      "Self-service password reset (SSPR), since it can generate a first-time password automatically",
+      "Certificate-based authentication, since certificates don't require an existing password",
+      "Windows Hello for Business, since it works the moment a device is unboxed with no prior sign-in"
+    ],
+    "correctIndex": 0,
+    "explanation": "Temporary Access Pass exists specifically to bootstrap passwordless registration for users with no existing credential — an admin issues a time-limited passcode used once to sign in and register a real method. SSPR (B) requires the user to already have an account with a password and pre-registered SSPR methods, which a brand-new hire doesn't have yet. Certificate-based authentication (C) requires a certificate to already be issued and trusted, which itself needs an initial provisioning step. Windows Hello for Business (D) is provisioned after the user has already signed into the device at least once, so it doesn't solve the very first sign-in problem."
+  },
+  {
+    "id": "sc_d2_002",
+    "domain": "Implement authentication and access management",
+    "title": "Rolling Out a Block on Legacy Authentication Safely",
+    "scenarioText": "Contoso wants to block legacy authentication protocols (which don't support MFA) tenant-wide via Conditional Access, but is worried an overly broad policy could immediately lock out line-of-business apps that still depend on legacy auth.",
+    "steps": null,
+    "question": "What is the recommended way to validate the policy's impact before it starts blocking sign-ins?",
+    "options": [
+      "Create the Conditional Access policy in Report-only mode first, review the sign-in logs for what it would have blocked, then switch it to On once the impact is understood",
+      "Enable the policy fully immediately, since Conditional Access policies can be undone instantly with zero impact",
+      "Test the policy only in a separate non-production tenant that has no relationship to the real user base",
+      "Skip Conditional Access and instead disable legacy authentication at the network firewall layer only"
+    ],
+    "correctIndex": 0,
+    "explanation": "Report-only mode evaluates the policy's conditions against real sign-ins and logs what would have happened, without actually granting or blocking access — exactly the safe validation step this scenario calls for. Enabling it fully right away (B) is the risky big-bang approach the scenario is trying to avoid; 'instantly reversible' undersells the real-world impact of blocked sign-ins before anyone notices. A disconnected test tenant (C) won't reflect Contoso's actual user and app population, so it can't reveal the real impact. A firewall-only block (D) bypasses Conditional Access's identity-aware, per-user reporting entirely and is a much blunter instrument."
+  },
+  {
+    "id": "sc_d2_003",
+    "domain": "Implement authentication and access management",
+    "title": "Distinguishing Sign-In Risk From User Risk",
+    "scenarioText": "Entra ID Protection flags two separate incidents: (1) a user signing in from an impossible travel location relative to their last sign-in, and (2) a user's credentials appearing in a known leaked-credentials dump.",
+    "steps": null,
+    "question": "How should these two risk types typically be handled with Identity Protection policies?",
+    "options": [
+      "Impossible travel is a sign-in risk (session-specific, addressed with step-up MFA for that sign-in); leaked credentials is a user risk (the account itself is compromised, addressed by requiring a secure password change)",
+      "Both are user risk and should always trigger the exact same password-reset remediation",
+      "Both are sign-in risk and should always trigger the exact same step-up MFA remediation",
+      "Impossible travel is a user risk requiring password reset; leaked credentials is a sign-in risk requiring step-up MFA"
+    ],
+    "correctIndex": 0,
+    "explanation": "Sign-in risk evaluates the probability that a specific authentication request isn't the legitimate owner (like unlikely travel), and is well handled with an in-session response like MFA. User risk evaluates the probability the account itself is compromised (like a credential appearing in a breach dump), which merits remediating the account itself, typically a secure password change. Treating both identically (B, C) ignores that the underlying threat model is different — a step-up MFA challenge doesn't fix an already-leaked password, and forcing a password reset for every impossible-travel sign-in is disruptive overkill. Swapping the mapping (D) has the definitions backwards."
+  },
+  {
+    "id": "sc_d2_004",
+    "domain": "Implement authentication and access management",
+    "title": "Protecting Conditional Access Policy Changes Themselves",
+    "scenarioText": "Contoso's security team is worried that an attacker who compromises a Conditional Access Administrator's already-authenticated session could quietly weaken or delete Conditional Access policies to open a backdoor, without needing to re-prove their identity.",
+    "steps": null,
+    "question": "Which Conditional Access capability directly mitigates this specific risk?",
+    "options": [
+      "Protected actions, which require the user to satisfy a fresh authentication requirement (like re-entering MFA) before performing sensitive actions such as editing Conditional Access policies, even within an already-valid session",
+      "Session management settings, which only control how long a browser session token remains valid before expiry",
+      "Authentication context, which is exclusively used to tag SharePoint and Teams resources for sensitivity labeling",
+      "Continuous access evaluation, which only reacts to changes like account disablement or network location changes, not admin actions inside the portal"
+    ],
+    "correctIndex": 0,
+    "explanation": "Protected actions let admins require a fresh, strong authentication event immediately before a sensitive action is carried out — even inside an already-authenticated session — which is exactly the 'hijacked session shouldn't be enough' gap described. Session management settings (B) govern token/session lifetime broadly, not a step-up check tied to a specific sensitive action. Authentication context (C) is a general mechanism usable across many resource types, not something exclusive to SharePoint/Teams, and by itself doesn't force a fresh challenge without being paired into a policy. Continuous access evaluation (D) reacts to signals like disablement, IP/location change, or token revocation events, but doesn't specifically gate an admin performing a policy edit inside a still-valid session."
+  },
+  {
+    "id": "sc_d2_005",
+    "domain": "Implement authentication and access management",
+    "title": "Giving Remote Workers App Access Without a VPN",
+    "scenarioText": "Contoso wants remote employees to securely reach a set of internal line-of-business web applications hosted on-prem, without deploying or maintaining a traditional VPN client, while still applying Conditional Access to that access.",
+    "steps": null,
+    "question": "Which Global Secure Access capability is purpose-built for this?",
+    "options": [
+      "Private Access, which lets you publish specific internal applications/segments for secure remote access enforced through the Global Secure Access client and Conditional Access, without a traditional VPN",
+      "Internet Access for Microsoft 365, which is scoped specifically to securing traffic to Microsoft 365 services, not internal on-prem apps",
+      "Microsoft Entra Application Proxy, which is a Global Secure Access component with no separate identity",
+      "Conditional Access device-enforced restrictions alone, with no additional Global Secure Access component needed"
+    ],
+    "correctIndex": 0,
+    "explanation": "Private Access is the Global Secure Access capability specifically for securely publishing internal, on-prem application access to remote users through the Global Secure Access client, without requiring a classic VPN, and it's Conditional Access-aware. Internet Access for Microsoft 365 (B) is scoped to protecting traffic destined for Microsoft 365 services specifically, not general internal on-prem apps. Application Proxy (C) is actually a separate, older capability for publishing on-prem web apps and is not simply a component of Global Secure Access. Device-enforced restrictions alone (D) control which apps/browser profiles can access data on a device; they don't provide the secure network path to reach the internal app in the first place."
+  },
+  {
+    "id": "sc_d3_001",
+    "domain": "Plan and implement workload identities",
+    "title": "Choosing an Identity for a Shared Azure Automation Task",
+    "scenarioText": "Contoso has three separate Azure Functions apps that all need to call the same downstream Azure Storage account. The security team wants a single identity whose lifecycle is managed independently of any one Functions app, and that can be assigned to all three.",
+    "steps": null,
+    "question": "Which identity type best fits this requirement?",
+    "options": [
+      "A user-assigned managed identity, created once and then assigned to all three Function apps, since its lifecycle is independent of any single resource",
+      "A system-assigned managed identity on each Function app, since system-assigned identities can be freely shared across multiple resources",
+      "A single shared service principal with a manually managed client secret, distributed to all three apps",
+      "A regular user account with Azure RBAC access, shared as a 'service account' logged into by each app"
+    ],
+    "correctIndex": 0,
+    "explanation": "A user-assigned managed identity is created as its own standalone Azure resource and can be assigned to multiple resources, with a lifecycle independent of any single Function app — exactly what's needed here. A system-assigned identity (B) is tied to the lifecycle of the single resource it's created on and is deleted when that resource is deleted, and it is not designed to be shared across multiple resources. A manually managed service principal secret (C) reintroduces the credential-rotation and secret-sprawl risk that managed identities exist to eliminate. A shared human/service user account (D) is against best practice for application-to-application authentication and lacks the credential-free design of managed identities."
+  },
+  {
+    "id": "sc_d3_002",
+    "domain": "Plan and implement workload identities",
+    "title": "Publishing a Legacy On-Prem App Externally",
+    "scenarioText": "Contoso has an older on-prem web application with no modern authentication support. Remote employees need to reach it securely from outside the corporate network, and Contoso wants Entra ID sign-in and Conditional Access enforced in front of it without rewriting the application.",
+    "steps": null,
+    "question": "Which capability is designed for this exact integration?",
+    "options": [
+      "Microsoft Entra Application Proxy, which fronts the on-prem app with Entra ID pre-authentication and lets Conditional Access apply before traffic reaches the app",
+      "App registrations with OAuth 2.0 authorization code flow configured directly in the legacy app's own code",
+      "A generic SaaS app integration from the gallery, since Application Proxy is limited to Microsoft 365 apps only",
+      "Managed identities assigned directly to the on-prem application server"
+    ],
+    "correctIndex": 0,
+    "explanation": "Application Proxy is specifically built to publish on-prem web applications for secure external access, doing Entra ID pre-authentication and enforcing Conditional Access in front of an app that itself may have no modern auth support. Rewriting the legacy app's code to speak OAuth 2.0 directly (B) contradicts the requirement of not modifying the application. A generic SaaS gallery app (C) is for cloud-hosted SaaS providers, not on-prem legacy apps, and Application Proxy's use isn't limited to Microsoft apps. Managed identities (D) let a workload authenticate outbound to other Azure resources — they don't provide inbound external access or authentication in front of an on-prem web server."
+  },
+  {
+    "id": "sc_d3_003",
+    "domain": "Plan and implement workload identities",
+    "title": "A Risky Third-Party App Consent Request",
+    "scenarioText": "An employee at Contoso is prompted to consent to a new third-party app that requests broad Microsoft Graph permissions, including full mailbox read access for the whole organization. Contoso's policy is that no single end user should be able to grant this level of access on their own.",
+    "steps": null,
+    "question": "What should be configured to prevent this outcome going forward?",
+    "options": [
+      "Restrict user consent so that requests for high-privilege permissions are routed into an admin consent workflow requiring review and approval by a designated admin/group",
+      "Disable all application registrations tenant-wide so no new apps can ever be added",
+      "Rely on end users to individually judge which permission requests are safe to approve",
+      "Grant every user the Application Administrator role so they can properly evaluate consent requests themselves"
+    ],
+    "correctIndex": 0,
+    "explanation": "Restricting user consent and enabling the admin consent workflow routes higher-risk permission requests to a designated reviewer instead of leaving the decision to an individual end user — directly matching the stated policy. Disabling all app registrations (B) is overly disruptive and blocks legitimate business need, not just risky broad-permission requests. Relying on user judgment (C) is precisely the gap the scenario says must be closed. Granting every user Application Administrator (D) massively over-provisions privilege and doesn't create any actual review step — it just lets everyone self-approve, which is the opposite of the goal."
+  },
+  {
+    "id": "sc_d3_004",
+    "domain": "Plan and implement workload identities",
+    "title": "Blocking Risky OAuth App Data Exfiltration",
+    "scenarioText": "Contoso's security team discovers that a browser extension users installed has an associated OAuth app with read/write access to their OneDrive files, and wants ongoing visibility and control over which OAuth-connected apps can access Microsoft 365 data, including the ability to ban specific ones.",
+    "steps": null,
+    "question": "Which tool is purpose-built for governing OAuth app access to connected cloud data?",
+    "options": [
+      "Microsoft Defender for Cloud Apps OAuth app policies, which surface and let you govern/ban risky OAuth apps that have been granted access to organizational data",
+      "Conditional Access device-enforced restrictions, which only apply to device-level file access, not third-party OAuth app grants",
+      "Microsoft Entra Application Proxy, which is designed for publishing on-prem apps, not governing third-party OAuth grants",
+      "Access reviews, which are scoped to reviewing role and group memberships, not OAuth app permission grants"
+    ],
+    "correctIndex": 0,
+    "explanation": "Defender for Cloud Apps includes OAuth app policies specifically for discovering, evaluating risk of, and taking action on (including banning) OAuth apps that have been granted access to org data — the exact capability described. Device-enforced restrictions (B) govern what a managed/unmanaged device can do with a session, not third-party app-to-data OAuth grants. Application Proxy (C) is for publishing internal on-prem web apps outward, unrelated to governing external OAuth app grants. Access reviews (D) are for periodically re-certifying role/group/access-package membership, not for OAuth app risk governance."
+  },
+  {
+    "id": "sc_d3_005",
+    "domain": "Plan and implement workload identities",
+    "title": "Single-Tenant vs Multi-Tenant App Registration",
+    "scenarioText": "Contoso is building an internal line-of-business application that should only ever be used by Contoso's own employees, never by users from other organizations' tenants.",
+    "steps": null,
+    "question": "How should the app registration's supported account type be configured?",
+    "options": [
+      "Single tenant (accounts in this organizational directory only), since the app is exclusively for Contoso's own users",
+      "Multi-tenant (accounts in any organizational directory), since it's simpler to leave open even for internal-only apps",
+      "Personal Microsoft accounts only, since that is the default and most restrictive setting",
+      "Multi-tenant and personal Microsoft accounts, to maximize compatibility regardless of actual audience"
+    ],
+    "correctIndex": 0,
+    "explanation": "Single-tenant registration restricts sign-in to accounts within Contoso's own directory, matching the stated requirement exactly and minimizing exposed attack surface. Multi-tenant (B) would allow users from any other organization's Entra tenant to potentially sign in, which is unnecessary and risky for an internal-only app. Personal Microsoft accounts only (C) would actually exclude Contoso's own work accounts, breaking the app entirely, and it is not the platform default. Combining multi-tenant and personal accounts (D) maximizes exposure for no benefit when the audience is known to be internal-only."
+  },
+  {
+    "id": "sc_d4_001",
+    "domain": "Plan and automate identity governance",
+    "title": "Structuring External Partner Access With Approval",
+    "scenarioText": "Contoso regularly grants external partner organizations time-limited access to a specific set of apps and groups for the duration of joint projects, and wants each request to go through a defined approval chain rather than being granted ad hoc by whichever admin is asked first.",
+    "steps": [
+      "Create a catalog containing the relevant apps/groups/SharePoint sites",
+      "Create an access package in that catalog defining eligible external requestors",
+      "Configure a multi-stage approval policy on the access package",
+      "Set an access expiration/review cadence on the package"
+    ],
+    "question": "What Entra governance feature should Contoso configure to standardize this process?",
+    "options": [
+      "Entitlement management — build an access package in a catalog with a defined approval policy and expiration, so every partner request follows the same governed path",
+      "A single shared 'Partners' security group that any admin can add external accounts to directly",
+      "PIM for Groups, since it is exclusively meant for internal Azure resource role elevation, not external partner access",
+      "Manually emailed spreadsheets tracking which partner has which access, reviewed quarterly"
+    ],
+    "correctIndex": 0,
+    "explanation": "Entitlement management access packages exist precisely to bundle resources into a requestable unit with defined approval workflow(s) and expiration, replacing ad hoc admin-by-admin grants with a standardized, auditable process. A shared group anyone can edit directly (B) reintroduces the exact ad hoc, inconsistent process the scenario wants to eliminate. PIM for Groups (C) is about time-bound elevation into group membership/roles, and while it can be combined with governance concepts, it isn't the entitlement/catalog/approval-chain feature described here, and it is not inherently exclusive to internal-only scenarios in a way that rules out external access packages. A manual spreadsheet (D) is not a governed, enforced Entra capability at all."
+  },
+  {
+    "id": "sc_d4_002",
+    "domain": "Plan and automate identity governance",
+    "title": "Periodically Re-Certifying Guest Access",
+    "scenarioText": "Contoso has accumulated hundreds of external guest users from past projects, many of whom no longer need access. Compliance requires proof that guest access is periodically re-validated and stale access is automatically removed if nobody attests to it being still needed.",
+    "steps": null,
+    "question": "Which feature should be configured to satisfy this compliance requirement?",
+    "options": [
+      "An access review scoped to guest users, run on a recurring schedule, configured to automatically remove access when a review isn't completed or is denied",
+      "A one-time manual audit of the guest users list performed by an admin with no recurrence",
+      "Conditional Access blocking all guest sign-ins permanently, regardless of whether access is still legitimately needed",
+      "Deleting all guest accounts older than 90 days without any review step"
+    ],
+    "correctIndex": 0,
+    "explanation": "Access reviews configured on a recurring schedule for guest users, with an auto-apply action on non-response or denial, directly satisfies 'periodically re-validated with automatic removal of stale access' — this is exactly the feature's purpose. A one-time manual audit (B) doesn't satisfy the ongoing/recurring compliance requirement. Permanently blocking all guest sign-in (C) breaks legitimate ongoing external collaboration, which isn't the stated goal. Deleting all guests past a fixed age with no review (D) risks removing still-needed access and isn't a governed re-certification process."
+  },
+  {
+    "id": "sc_d4_003",
+    "domain": "Plan and automate identity governance",
+    "title": "Reducing Standing Global Administrator Assignments",
+    "scenarioText": "Contoso's security audit finds 12 permanent, always-on Global Administrator assignments. The security team wants admins to only hold that privilege for the specific window of time they're actively doing privileged work, and wants a required approval step before elevation.",
+    "steps": null,
+    "question": "What should be configured in Privileged Identity Management to meet this requirement?",
+    "options": [
+      "Convert the assignments to eligible (not active) in PIM for the Global Administrator role, with 'require approval to activate' enabled",
+      "Leave the assignments as permanent active Global Administrator, since PIM only applies to Azure resource roles, not Entra roles",
+      "Remove Global Administrator entirely from all 12 users with no replacement access, halting all privileged administration",
+      "Convert the assignments to active PIM assignments with no time limit and no approval requirement, since that alone satisfies the audit"
+    ],
+    "correctIndex": 0,
+    "explanation": "PIM lets you make a role assignment eligible rather than permanently active, requiring the admin to activate it (optionally with required approval) only when needed, for a bounded time window — exactly matching 'only hold the privilege for the specific window of active work, with approval.' PIM does apply to Entra ID directory roles like Global Administrator, not just Azure resource roles (B is a false restriction). Removing the role entirely (C) would block legitimate administration, overcorrecting the finding. An active assignment with no time limit and no approval (D) doesn't address either part of the requirement — it's not time-bound and has no approval gate."
+  },
+  {
+    "id": "sc_d4_004",
+    "domain": "Plan and automate identity governance",
+    "title": "Ensuring Emergency Access Survives an Outage",
+    "scenarioText": "Contoso's Conditional Access and MFA policies are broad and strict tenant-wide. The security team worries that during an identity-provider outage or a misconfigured policy rollout, every admin could be locked out simultaneously with no way back in.",
+    "steps": null,
+    "question": "What should Contoso configure to prevent a total admin lockout scenario?",
+    "options": [
+      "One or more break-glass accounts, excluded from Conditional Access and MFA registration campaigns, with credentials stored securely offline and sign-in activity closely monitored/alerted",
+      "Give every admin the same shared standard account password so any of them can sign in if one is locked out",
+      "Disable Conditional Access tenant-wide permanently to avoid ever risking a lockout",
+      "Rely on Self-Service Password Reset for admin accounts, since SSPR is unaffected by any Conditional Access or MFA outage scenario"
+    ],
+    "correctIndex": 0,
+    "explanation": "Break-glass (emergency access) accounts, deliberately excluded from Conditional Access and MFA registration campaign policies and tightly monitored, are the standard way to guarantee a path back in during an outage or bad policy push, without weakening protection on normal accounts. Sharing a standard account's password (B) is a serious security anti-pattern and doesn't guarantee bypassing whatever policy caused the lockout. Permanently disabling Conditional Access (C) removes broad protections just to avoid a narrow edge case, which is a disproportionate response. SSPR (D) is itself typically subject to the same Conditional Access/MFA policies and sign-in requirements, so it isn't guaranteed to be immune to the same outage or misconfiguration."
+  },
+  {
+    "id": "sc_d4_005",
+    "domain": "Plan and automate identity governance",
+    "title": "Investigating a Spike in Failed Sign-Ins",
+    "scenarioText": "Contoso's security team notices a sudden spike in failed sign-in attempts against several executive accounts and wants to build a recurring query to detect this pattern automatically going forward, plus route the underlying logs to long-term storage for retention.",
+    "steps": null,
+    "question": "What should be configured to support both the recurring detection query and long-term log retention?",
+    "options": [
+      "Configure diagnostic settings to stream sign-in logs to a Log Analytics workspace (for KQL-based detection queries and workbooks) and/or a storage account (for long-term retention)",
+      "Manually export the sign-in logs from the Entra portal to a spreadsheet once, whenever an incident is suspected",
+      "Rely solely on Identity Secure Score, since it already provides ad hoc custom KQL query capability",
+      "Disable sign-in logging entirely to reduce noise, then re-enable it only after an incident is already suspected"
+    ],
+    "correctIndex": 0,
+    "explanation": "Diagnostic settings let you route sign-in (and audit/provisioning) logs to a Log Analytics workspace, where KQL queries and workbooks can run recurring detections, and/or to a storage account for long-term retention — covering both stated needs in one configuration. A one-off manual export (B) doesn't provide recurring, automated detection. Identity Secure Score (C) gives posture recommendations and a score, not a custom KQL query engine over raw logs. Disabling logging (D) would eliminate the very data needed to detect and investigate the spike, the opposite of what's required."
+  }
+]

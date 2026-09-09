@@ -1,0 +1,2242 @@
+[
+  {
+    "id": "q_d1_001",
+    "domain": "Implement and manage user identities",
+    "subtopic": "builtin_custom_roles",
+    "question": "An admin needs to grant a team the ability to reset passwords for standard users but must not grant that team any other directory permissions. What is the best-practice approach?",
+    "options": [
+      "Assign the built-in Helpdesk Administrator role, which is scoped for exactly this kind of limited password-reset task",
+      "Assign the Global Administrator role temporarily and remove it after the task is done",
+      "Create a custom role with only the microsoft.directory/users/password/update permission and assign it to the team",
+      "Add the team to the User Administrator role, which includes password reset among other user-management rights"
+    ],
+    "correctIndex": 2,
+    "explanation": "A custom role scoped to only the password-update permission is the least-privilege choice. Helpdesk Administrator (A) is close but actually grants broader helpdesk permissions (including some support-ticket-style actions) beyond just password reset, so it's not the tightest scope. Global Administrator (B) is wildly overprivileged and manual removal is error-prone. User Administrator (D) includes full user lifecycle management, not just password reset, so it's broader than required."
+  },
+  {
+    "id": "q_d1_002",
+    "domain": "Implement and manage user identities",
+    "subtopic": "builtin_custom_roles",
+    "question": "Which statement about custom Microsoft Entra roles is accurate?",
+    "options": [
+      "Custom roles can only be assigned at the tenant (directory) scope, never at a resource scope",
+      "Custom roles are built by combining specific resource-provider permissions and can be assigned at directory or administrative unit scope",
+      "Custom roles automatically inherit all permissions of the closest matching built-in role",
+      "Custom roles cannot be used to manage groups, only users"
+    ],
+    "correctIndex": 1,
+    "explanation": "Custom Entra roles let you pick granular permissions and assign them at directory scope or narrower (like an administrative unit). They don't inherit from built-in roles (C is false — they're built permission-by-permission) and aren't restricted from group-management permissions (D is false) or limited to only tenant-wide scope (A is false, since AU scoping is a key feature)."
+  },
+  {
+    "id": "q_d1_003",
+    "domain": "Implement and manage user identities",
+    "subtopic": "administrative_units_when",
+    "question": "A university wants its regional IT teams to manage users only within their own college (e.g., Engineering, Business) without seeing or managing users in other colleges. What Microsoft Entra feature best fits this requirement?",
+    "options": [
+      "Dynamic security groups scoped by department attribute",
+      "Administrative units, with each college represented as its own unit and delegated admins scoped to it",
+      "Conditional Access policies targeting each department",
+      "Custom security attributes assigned to each user's department"
+    ],
+    "correctIndex": 1,
+    "explanation": "Administrative units exist specifically to delegate scoped administration over a subset of users/groups/devices (like one college) without giving admins visibility into the rest of the directory. Dynamic groups (A) organize membership but don't scope admin permissions. Conditional Access (C) controls access policy, not admin delegation. Custom security attributes (D) are metadata/filtering tags, not a delegation boundary."
+  },
+  {
+    "id": "q_d1_004",
+    "domain": "Implement and manage user identities",
+    "subtopic": "administrative_units_config",
+    "question": "An administrator creates an administrative unit called 'EMEA Users' and adds a scoped role assignment of Helpdesk Administrator to a user for that unit. What is the effect?",
+    "options": [
+      "The user can reset passwords for every user in the tenant, but the AU restricts their sign-in location to EMEA",
+      "The user's Helpdesk Administrator permissions apply only to members of the EMEA Users administrative unit, not the whole tenant",
+      "The AU assignment has no effect until the user is also given a tenant-wide role",
+      "Administrative units only support Global Administrator role assignments, so this configuration is invalid"
+    ],
+    "correctIndex": 1,
+    "explanation": "Scoping a role assignment to an administrative unit restricts that role's effective permissions to just the members of that AU. It has nothing to do with sign-in location (A is a fabricated capability), doesn't require an additional tenant-wide role to function (C is false — the whole point of AU-scoped roles is that they work without one), and AUs support many roles beyond Global Administrator, in fact Global Administrator is typically NOT AU-scoped (D is false)."
+  },
+  {
+    "id": "q_d1_005",
+    "domain": "Implement and manage user identities",
+    "subtopic": "administrative_units_config",
+    "question": "Which object types can be added as members of a Microsoft Entra administrative unit?",
+    "options": [
+      "Users and groups only",
+      "Users, groups, and devices",
+      "Only security groups, not users directly",
+      "Only Microsoft 365 groups"
+    ],
+    "correctIndex": 1,
+    "explanation": "Administrative units can contain users, groups, and devices, letting delegated admins manage all three object types within their scope. Restricting to just users and groups (A), only groups (C), or only M365 groups (D) all understate the supported membership types."
+  },
+  {
+    "id": "q_d1_006",
+    "domain": "Implement and manage user identities",
+    "subtopic": "effective_permissions",
+    "question": "A user has been assigned the User Administrator role at the tenant level AND is also a member of an administrative unit where they hold the Helpdesk Administrator role. What best describes their effective permissions?",
+    "options": [
+      "Only the more restrictive of the two roles applies",
+      "The two role assignments are additive — they have User Administrator's tenant-wide permissions plus Helpdesk Administrator's permissions scoped to the AU",
+      "Only the tenant-scoped assignment applies; the AU-scoped assignment is ignored",
+      "Their permissions default to Global Reader until an admin manually reconciles the conflict"
+    ],
+    "correctIndex": 1,
+    "explanation": "Entra role assignments are additive — a user's effective permissions are the union of every assignment they hold, each respecting its own scope. There's no 'most restrictive wins' behavior (A is false), AU-scoped assignments aren't ignored (C is false), and there's no automatic downgrade to Global Reader (D is fabricated)."
+  },
+  {
+    "id": "q_d1_007",
+    "domain": "Implement and manage user identities",
+    "subtopic": "effective_permissions",
+    "question": "Which tool would an administrator use to check exactly which effective permissions a specific user has across role assignments before troubleshooting an access issue?",
+    "options": [
+      "The 'Check access' / effective permissions view in Microsoft Entra ID for that user or role",
+      "Microsoft Defender for Cloud Apps risk score",
+      "The Azure Cost Management dashboard",
+      "Group naming policy settings"
+    ],
+    "correctIndex": 0,
+    "explanation": "Microsoft Entra ID provides a way to view a user's effective role assignments (including inherited/scoped ones) so admins can audit exactly what access someone has. The other options (B, C, D) are unrelated services/features that don't surface role/permission data."
+  },
+  {
+    "id": "q_d1_008",
+    "domain": "Implement and manage user identities",
+    "subtopic": "domains_config",
+    "question": "An organization wants to send email as user@contoso.com but their tenant's default domain is contoso.onmicrosoft.com. What must the admin do first before creating users with the contoso.com UPN suffix?",
+    "options": [
+      "Nothing — any UPN suffix can be used immediately without verification",
+      "Add and verify the contoso.com custom domain in Microsoft Entra ID (e.g., via DNS TXT record) before it can be used as a UPN suffix",
+      "Purchase a Microsoft 365 Enterprise E5 license, which unlocks custom domains",
+      "Rename the default onmicrosoft.com domain to contoso.com"
+    ],
+    "correctIndex": 1,
+    "explanation": "A custom domain must be added and verified (proving DNS ownership, typically via a TXT or MX record) before it becomes available as a UPN suffix or email domain option. Custom domains aren't gated by a specific license SKU (C is false) or usable without verification (A is false), and the onmicrosoft.com domain can't be renamed away, only supplemented (D is false)."
+  },
+  {
+    "id": "q_d1_009",
+    "domain": "Implement and manage user identities",
+    "subtopic": "domains_config",
+    "question": "What happens to a custom domain that becomes 'unverified' in Microsoft Entra ID (e.g., the DNS TXT record was removed)?",
+    "options": [
+      "All users with that domain's UPN suffix are immediately deleted",
+      "The domain can no longer be used for new UPNs/email addresses and may eventually need re-verification; existing users generally keep functioning but the domain should be re-verified promptly",
+      "The tenant is automatically suspended by Microsoft",
+      "Nothing changes — verification is a one-time check with no ongoing relevance"
+    ],
+    "correctIndex": 1,
+    "explanation": "An unverified domain risks losing its ability to be used for new configuration and should be re-verified, but Microsoft doesn't delete existing users (A is false) or suspend the tenant (C is false) over this. Verification isn't purely a one-time formality with zero ongoing relevance either (D is false) — losing verification is a real operational risk worth monitoring."
+  },
+  {
+    "id": "q_d1_010",
+    "domain": "Implement and manage user identities",
+    "subtopic": "company_branding",
+    "question": "A company wants their sign-in page to show their logo and a custom background image instead of the default Microsoft branding. Where is this configured?",
+    "options": [
+      "Company branding settings in Microsoft Entra ID",
+      "Conditional Access named locations",
+      "Microsoft Entra ID Protection policies",
+      "The tenant's custom domain DNS records"
+    ],
+    "correctIndex": 0,
+    "explanation": "Company branding in Microsoft Entra ID lets admins customize the sign-in experience (logo, background image, layout, sign-in page text) per tenant and even per language/browser context. Conditional Access (B) and ID Protection (C) control access policy, not visual branding, and DNS records (D) have nothing to do with UI customization."
+  },
+  {
+    "id": "q_d1_011",
+    "domain": "Implement and manage user identities",
+    "subtopic": "tenant_user_group_device_settings",
+    "question": "By default, can regular (non-admin) users in Microsoft Entra ID create new Microsoft 365 groups?",
+    "options": [
+      "No, group creation is always restricted to Global Administrators only",
+      "Yes by default, but this can be restricted via tenant-level group settings to specific users or disabled entirely",
+      "No, only through PowerShell with elevated permissions can any group be created",
+      "Yes, but only security groups, never Microsoft 365 groups"
+    ],
+    "correctIndex": 1,
+    "explanation": "Microsoft Entra ID ships with self-service group creation enabled for all users by default, but tenant-level group settings let admins restrict this to a designated set of users or turn it off. It's not locked to Global Admins only (A is false), not PowerShell-only (C is false), and the default behavior does include Microsoft 365 groups, not just security groups (D is false)."
+  },
+  {
+    "id": "q_d1_012",
+    "domain": "Implement and manage user identities",
+    "subtopic": "tenant_user_group_device_settings",
+    "question": "Which tenant-level setting controls whether users can register their own devices with Microsoft Entra ID?",
+    "options": [
+      "Company branding settings",
+      "Device settings under Microsoft Entra ID, which include device registration and join policies",
+      "Conditional Access session controls",
+      "License assignment settings"
+    ],
+    "correctIndex": 1,
+    "explanation": "Tenant-wide device settings govern device registration/join behavior, including which users are allowed to register devices and whether additional authentication (like MFA) is required to do so. Branding (A) is purely cosmetic, Conditional Access session controls (C) govern session behavior after sign-in rather than registration eligibility, and licensing (D) doesn't gate device registration policy."
+  },
+  {
+    "id": "q_d1_013",
+    "domain": "Implement and manage user identities",
+    "subtopic": "create_manage_users",
+    "question": "An admin needs to create 50 new user accounts with a consistent naming convention and department attribute. What is the most efficient supported method?",
+    "options": [
+      "Manually create each user one at a time through the Microsoft Entra admin center",
+      "Use a CSV bulk-create operation or a PowerShell script (Microsoft Graph PowerShell SDK) to create all 50 users in one operation",
+      "Ask each of the 50 people to self-register their own accounts",
+      "Clone an existing user account 50 times"
+    ],
+    "correctIndex": 1,
+    "explanation": "Bulk operations (CSV import in the admin center, or Microsoft Graph PowerShell scripting) are the supported, efficient way to create many users consistently. Manual one-by-one creation (A) doesn't scale well for 50 accounts, self-registration (C) isn't a standard admin-initiated provisioning method for employee accounts, and there's no 'clone a user' feature (D)."
+  },
+  {
+    "id": "q_d1_014",
+    "domain": "Implement and manage user identities",
+    "subtopic": "create_manage_users",
+    "question": "What is the effect of setting a user account's 'Block sign in' property to Yes?",
+    "options": [
+      "The user's account and all data are permanently deleted",
+      "The user is temporarily prevented from signing in to any Microsoft Entra-connected service, but the account and its data remain intact",
+      "The user's licenses are automatically reassigned to another user",
+      "The user is added to a 'blocked users' security group visible to all admins"
+    ],
+    "correctIndex": 1,
+    "explanation": "Blocking sign-in is a reversible way to disable access without deleting the account or its associated data/licenses. It doesn't delete anything (A is false), doesn't auto-reassign licenses (C is false — those stay assigned unless manually changed), and doesn't create any group membership (D is fabricated)."
+  },
+  {
+    "id": "q_d1_015",
+    "domain": "Implement and manage user identities",
+    "subtopic": "create_manage_groups",
+    "question": "What is the key functional difference between a Microsoft 365 group and a security group in Microsoft Entra ID?",
+    "options": [
+      "Security groups can only contain devices, never users",
+      "Microsoft 365 groups provide collaboration resources (shared mailbox, calendar, SharePoint site, Teams) in addition to access management, while security groups are purely for access/permission assignment",
+      "Security groups automatically sync to on-premises Active Directory while Microsoft 365 groups never do",
+      "Microsoft 365 groups cannot be used to assign application access"
+    ],
+    "correctIndex": 1,
+    "explanation": "Microsoft 365 groups bundle collaboration resources on top of membership management; security groups exist solely to control access to resources/apps without those collaboration extras. Security groups aren't device-only (A is false), sync behavior isn't a defining difference and isn't described that way (C is false), and Microsoft 365 groups CAN be used for app assignment (D is false)."
+  },
+  {
+    "id": "q_d1_016",
+    "domain": "Implement and manage user identities",
+    "subtopic": "create_manage_groups",
+    "question": "An admin wants group membership to automatically update based on a user attribute like department='Sales' with no manual maintenance. What should they configure?",
+    "options": [
+      "An assigned (static) security group",
+      "A dynamic membership group with a rule based on the department attribute",
+      "A distribution list",
+      "A Conditional Access named location"
+    ],
+    "correctIndex": 1,
+    "explanation": "Dynamic membership groups evaluate a rule (like user.department -eq \"Sales\") continuously and auto-update membership, exactly matching the no-manual-maintenance requirement. Assigned/static groups (A) require manual add/remove, distribution lists (C) are an Exchange-focused concept without Entra dynamic-rule support in this context, and named locations (D) are a Conditional Access network concept, unrelated to group membership."
+  },
+  {
+    "id": "q_d1_017",
+    "domain": "Implement and manage user identities",
+    "subtopic": "custom_security_attributes",
+    "question": "What are custom security attributes in Microsoft Entra ID primarily used for?",
+    "options": [
+      "Storing arbitrary business-defined attribute/value pairs on users or other objects, which can then be used for fine-grained authorization (e.g., in Conditional Access or RBAC conditions)",
+      "Encrypting a user's password before storage",
+      "Defining the visual theme of the sign-in page",
+      "Replacing the need for security groups entirely"
+    ],
+    "correctIndex": 0,
+    "explanation": "Custom security attributes let organizations tag objects with their own key/value metadata (e.g., Project=Falcon, Classification=Confidential) for use in access decisions and reporting. They're unrelated to password encryption (B, which Microsoft always handles internally regardless), sign-in page branding (C), and they complement rather than replace security groups (D)."
+  },
+  {
+    "id": "q_d1_018",
+    "domain": "Implement and manage user identities",
+    "subtopic": "custom_security_attributes",
+    "question": "Which built-in role is specifically required to define new custom security attribute definitions (as opposed to just assigning existing attribute values to users)?",
+    "options": [
+      "Any Global Administrator can always do this with no separate role needed",
+      "Attribute Definition Administrator (a distinct role from Attribute Assignment Administrator)",
+      "User Administrator",
+      "Helpdesk Administrator"
+    ],
+    "correctIndex": 1,
+    "explanation": "Microsoft Entra deliberately splits this into two narrow roles: Attribute Definition Administrator can create/manage the attribute schema itself, while a separate Attribute Assignment Administrator role can only assign existing attribute values to objects — even Global Administrators do NOT get this by default without one of these roles (A is false), and User Administrator (C) / Helpdesk Administrator (D) don't include this capability."
+  },
+  {
+    "id": "q_d1_019",
+    "domain": "Implement and manage user identities",
+    "subtopic": "bulk_operations_powershell",
+    "question": "An admin wants to reset the department attribute for 200 users listed in a CSV file. What is the most appropriate approach?",
+    "options": [
+      "Manually edit each of the 200 user profiles in the admin center UI",
+      "Write a Microsoft Graph PowerShell script that reads the CSV and calls Update-MgUser (or equivalent) in a loop for each user",
+      "Delete and recreate all 200 accounts with the new attribute",
+      "Use Company branding settings to apply the change tenant-wide"
+    ],
+    "correctIndex": 1,
+    "explanation": "Scripting bulk attribute updates via Microsoft Graph PowerShell against a CSV input is the standard, efficient, and safe way to make the same kind of change across many accounts. Manual UI editing (A) doesn't scale to 200 users, deleting/recreating accounts (C) is destructive and unnecessary, and branding settings (D) have nothing to do with user attributes."
+  },
+  {
+    "id": "q_d1_020",
+    "domain": "Implement and manage user identities",
+    "subtopic": "bulk_operations_powershell",
+    "question": "What must an administrator have installed and connected before running Microsoft Graph PowerShell cmdlets against a tenant?",
+    "options": [
+      "Nothing — Microsoft Graph PowerShell cmdlets work without any module or authentication",
+      "The Microsoft.Graph PowerShell module, plus an authenticated connection (Connect-MgGraph) with appropriate delegated or application permissions/scopes",
+      "Only a valid Azure subscription, with no PowerShell module required",
+      "The legacy MSOnline module exclusively, since Microsoft Graph PowerShell doesn't support bulk operations"
+    ],
+    "correctIndex": 1,
+    "explanation": "You need the Microsoft.Graph module installed and an authenticated session (Connect-MgGraph) requesting the right Graph API permission scopes for whatever objects/actions the script performs. PowerShell can't run without a module and auth (A is false), an Azure subscription alone isn't what authorizes Graph calls (C is false), and Microsoft Graph PowerShell fully supports bulk-style scripted operations, making the claim in D false."
+  },
+  {
+    "id": "q_d1_021",
+    "domain": "Implement and manage user identities",
+    "subtopic": "device_join_registration",
+    "question": "What is the difference between a Microsoft Entra joined device and a Microsoft Entra registered device?",
+    "options": [
+      "There is no difference; the terms are interchangeable",
+      "A joined device is fully owned/managed by the organization with an org-issued Entra identity as its primary account; a registered device is typically a personal/BYOD device that just has an Entra identity added alongside its existing local/personal account",
+      "Registered devices support Conditional Access, but joined devices do not",
+      "Joined devices are only for mobile phones, while registered devices are only for desktops"
+    ],
+    "correctIndex": 1,
+    "explanation": "Entra join is meant for corporate-owned devices with the org identity as the primary sign-in account; Entra registration (e.g., via 'Add work or school account') is meant for BYOD scenarios where the device keeps its personal primary account. There absolutely is a meaningful difference (A is false), both joined and registered devices can be Conditional Access targets (C is false), and neither is restricted by device form factor the way D claims."
+  },
+  {
+    "id": "q_d1_022",
+    "domain": "Implement and manage user identities",
+    "subtopic": "licenses",
+    "question": "An admin removes a Microsoft Entra ID P2 license from a user who currently has active Conditional Access and Identity Protection policies applying to them. What is the most likely effect?",
+    "options": [
+      "Nothing changes, licenses have no bearing on which policies apply",
+      "P2-dependent features (like Identity Protection risk-based policies) stop being enforced for that user once the license is removed, since those features require an active P2 (or equivalent) license",
+      "The user's account is automatically deleted",
+      "The removal is blocked by Entra ID until all policies referencing the user are deleted first"
+    ],
+    "correctIndex": 1,
+    "explanation": "Premium features like Identity Protection and certain Conditional Access risk-based controls require an assigned P2 (or bundled equivalent) license per user; removing it typically stops those specific premium capabilities from applying to that user going forward. License changes don't delete accounts (C is false) or get blocked by pending policy references (D is false), and licensing absolutely does affect feature availability, so A is false."
+  },
+  {
+    "id": "q_d1_023",
+    "domain": "Implement and manage user identities",
+    "subtopic": "licenses",
+    "question": "What is 'group-based licensing' used for in Microsoft Entra ID?",
+    "options": [
+      "Automatically assigning (and removing) licenses to users based on their membership in a group, rather than assigning licenses to each user individually",
+      "Restricting which groups can be created based on license SKU",
+      "Encrypting group membership data",
+      "Preventing dynamic groups from being created"
+    ],
+    "correctIndex": 0,
+    "explanation": "Group-based licensing assigns a license SKU to a group; any user added to that group inherits the license automatically, and it's removed if they leave — a major administrative time-saver over per-user assignment. The other options describe capabilities that don't exist or aren't what group-based licensing does."
+  },
+  {
+    "id": "q_d1_024",
+    "domain": "Implement and manage user identities",
+    "subtopic": "external_collaboration_settings",
+    "question": "An organization wants to restrict which external domains its employees can invite as B2B guest users (e.g., only trusted partner domains). Where is this configured?",
+    "options": [
+      "External collaboration settings in Microsoft Entra ID, using the allowlist/denylist for collaboration domains",
+      "Conditional Access named locations",
+      "Company branding settings",
+      "Custom security attribute definitions"
+    ],
+    "correctIndex": 0,
+    "explanation": "External collaboration settings include domain allow/deny lists that govern which external domains employees can invite as B2B guests. Named locations (B) are a network-location concept for Conditional Access, unrelated to invite domain restrictions; branding (C) and security attributes (D) have no bearing on this."
+  },
+  {
+    "id": "q_d1_025",
+    "domain": "Implement and manage user identities",
+    "subtopic": "invite_external_users",
+    "question": "What is the most efficient way to invite 30 external partners as B2B guest users at once?",
+    "options": [
+      "Send each partner a personal email asking them to self-register an account",
+      "Use the bulk invite feature (CSV upload) in Microsoft Entra ID to invite all 30 at once",
+      "Individually create each guest invitation through the UI one at a time",
+      "Ask the partners' own IT department to create the accounts in your tenant"
+    ],
+    "correctIndex": 1,
+    "explanation": "Microsoft Entra ID supports a bulk invite (CSV-based) flow specifically for inviting many external users at once. Ad hoc email requests (A) aren't a formal provisioning method, one-by-one UI invitations (C) don't scale efficiently to 30 people, and another organization's IT team cannot create accounts inside your tenant (D)."
+  },
+  {
+    "id": "q_d1_026",
+    "domain": "Implement and manage user identities",
+    "subtopic": "manage_external_user_accounts",
+    "question": "A B2B guest user's access needs to be reviewed and removed if they no longer need it. What Entra capability directly supports periodically checking and removing stale guest access?",
+    "options": [
+      "Access reviews",
+      "Company branding settings",
+      "Custom domains",
+      "Device join settings"
+    ],
+    "correctIndex": 0,
+    "explanation": "Access reviews (part of identity governance) are designed exactly for periodically validating whether guest (or any) access should continue, with reviewers able to approve or remove access. Branding (B), custom domains (C), and device join settings (D) are unrelated to reviewing or revoking external user access."
+  },
+  {
+    "id": "q_d1_027",
+    "domain": "Implement and manage user identities",
+    "subtopic": "cross_tenant_access_settings",
+    "question": "What do Cross-tenant access settings in Microsoft Entra ID primarily control?",
+    "options": [
+      "How your organization's users collaborate with (and are trusted by) specific other Microsoft Entra tenants, including inbound and outbound trust settings for MFA and device compliance claims",
+      "The DNS settings for your tenant's custom domains",
+      "Which licenses are available for purchase",
+      "The visual theme of the admin portal"
+    ],
+    "correctIndex": 0,
+    "explanation": "Cross-tenant access settings define organization-specific (or default) trust relationships with other Entra tenants — for example, trusting another tenant's MFA claim so your users aren't prompted again, and controlling B2B/B2B-direct-connect collaboration inbound/outbound. DNS (B), licensing (C), and portal theming (D) are unrelated capabilities."
+  },
+  {
+    "id": "q_d1_028",
+    "domain": "Implement and manage user identities",
+    "subtopic": "cross_tenant_access_settings",
+    "question": "An organization wants to trust a partner tenant's multifactor authentication so their users aren't prompted for MFA again when accessing shared resources. What should be configured?",
+    "options": [
+      "A Conditional Access named location for the partner's IP range",
+      "An inbound cross-tenant access setting trusting the partner tenant's MFA claim",
+      "A custom security attribute on each partner user",
+      "Company branding matching the partner's logo"
+    ],
+    "correctIndex": 1,
+    "explanation": "Trusting another tenant's MFA claim is done through cross-tenant access settings (inbound trust settings), which is the mechanism designed for this exact scenario. A named location (A) only addresses network location, not MFA trust; custom attributes (C) and branding (D) don't affect authentication trust between tenants."
+  },
+  {
+    "id": "q_d1_029",
+    "domain": "Implement and manage user identities",
+    "subtopic": "cross_tenant_synchronization",
+    "question": "What is the purpose of cross-tenant synchronization in Microsoft Entra ID?",
+    "options": [
+      "Automatically provisioning and keeping user accounts synchronized from a source tenant into one or more target tenants, commonly used across multiple tenants within the same larger organization (e.g., after a merger)",
+      "Synchronizing on-premises Active Directory with a single Entra tenant",
+      "Backing up all tenant configuration to Azure Blob Storage",
+      "Synchronizing Conditional Access policies between test and production tenants"
+    ],
+    "correctIndex": 0,
+    "explanation": "Cross-tenant synchronization automates user provisioning/deprovisioning between separate Entra tenants that belong to the same overall organization (common post-M&A or multi-subsidiary scenario). On-prem AD sync to a single tenant (B) describes Entra Connect Sync/Cloud Sync instead, and there's no built-in feature matching C or D as described."
+  },
+  {
+    "id": "q_d1_030",
+    "domain": "Implement and manage user identities",
+    "subtopic": "external_identity_providers",
+    "question": "An organization needs to let users from a partner company sign in using the partner's own SAML-based identity provider, without creating separate Entra accounts for each partner user. What should be configured?",
+    "options": [
+      "A dynamic security group for the partner's users",
+      "A federated (SAML/WS-Fed) external identity provider connection in External Identities",
+      "A custom security attribute mapping",
+      "Group-based licensing for the partner domain"
+    ],
+    "correctIndex": 1,
+    "explanation": "External Identities supports configuring federation with an external SAML or WS-Fed identity provider so users authenticate with their home IdP without needing locally-managed Entra credentials. A dynamic group (A) only affects membership rules, not authentication federation, and C/D don't relate to identity provider federation at all."
+  },
+  {
+    "id": "q_d1_031",
+    "domain": "Implement and manage user identities",
+    "subtopic": "entra_connect_sync",
+    "question": "What is the primary purpose of Microsoft Entra Connect Sync?",
+    "options": [
+      "Synchronizing identity objects (users, groups, contacts) and their attributes from an on-premises Active Directory to Microsoft Entra ID",
+      "Providing single sign-on for SaaS apps with no on-premises component",
+      "Managing Conditional Access policies across multiple tenants",
+      "Encrypting data at rest in Azure Storage"
+    ],
+    "correctIndex": 0,
+    "explanation": "Entra Connect Sync (the successor to Azure AD Connect) is the on-premises-to-cloud directory synchronization engine, keeping hybrid identity objects and attributes consistent. SSO for pure-cloud SaaS apps without an on-prem component (B) isn't its purpose, and it has nothing to do with cross-tenant Conditional Access management (C) or storage encryption (D)."
+  },
+  {
+    "id": "q_d1_032",
+    "domain": "Implement and manage user identities",
+    "subtopic": "entra_connect_sync",
+    "question": "An organization wants only users in a specific OU to sync to Microsoft Entra ID, excluding all others. What Entra Connect Sync feature enables this?",
+    "options": [
+      "Password hash synchronization",
+      "Scoping filters (OU-based filtering) configured during or after Connect Sync setup",
+      "Seamless SSO",
+      "Pass-through authentication"
+    ],
+    "correctIndex": 1,
+    "explanation": "Entra Connect Sync supports OU-based (and attribute-based) scoping filters so only selected on-prem objects sync to the cloud. Password hash sync (A), seamless SSO (C), and pass-through authentication (D) are all authentication-method features, not object-scoping/filtering features."
+  },
+  {
+    "id": "q_d1_033",
+    "domain": "Implement and manage user identities",
+    "subtopic": "entra_cloud_sync",
+    "question": "How does Microsoft Entra Cloud Sync differ from Entra Connect Sync in terms of architecture?",
+    "options": [
+      "There is no architectural difference, they are the same product with different names",
+      "Cloud Sync uses lightweight, cloud-managed provisioning agents (with agent auto-update and simpler multi-forest support) instead of the single, locally-installed and locally-managed Connect Sync server",
+      "Cloud Sync only supports Conditional Access, not user provisioning",
+      "Cloud Sync requires disabling all on-premises Active Directory"
+    ],
+    "correctIndex": 1,
+    "explanation": "Cloud Sync uses lightweight provisioning agents managed from the cloud, simplifying multi-forest scenarios and reducing on-prem management overhead compared to the traditional Connect Sync server model. They are meaningfully different products (A is false), Cloud Sync's core purpose IS user provisioning (C is false), and it doesn't require disabling on-prem AD (D is false — it still reads from AD, just via lightweight agents)."
+  },
+  {
+    "id": "q_d1_034",
+    "domain": "Implement and manage user identities",
+    "subtopic": "password_hash_sync",
+    "question": "What does password hash synchronization actually synchronize to Microsoft Entra ID?",
+    "options": [
+      "The user's plaintext password",
+      "A hash of the password hash (a further-hashed representation), never the reversible plaintext or the raw on-prem hash",
+      "Only the password's length and complexity score",
+      "Nothing password-related; only the account's existence syncs"
+    ],
+    "correctIndex": 1,
+    "explanation": "Password hash sync takes the on-prem password hash and hashes it again (using a per-user salt) before sending it to Entra ID — the plaintext password is never transmitted or stored in the cloud. Options A, C, and D all misdescribe what's actually synchronized."
+  },
+  {
+    "id": "q_d1_035",
+    "domain": "Implement and manage user identities",
+    "subtopic": "pass_through_authentication",
+    "question": "With pass-through authentication (PTA) enabled, where does the actual password validation occur during sign-in?",
+    "options": [
+      "Entirely in the cloud, using a synchronized password hash",
+      "On-premises, validated directly against Active Directory Domain Services via a lightweight PTA agent, with no password hash stored in the cloud",
+      "On the user's local device only",
+      "Validation is skipped entirely if PTA is enabled"
+    ],
+    "correctIndex": 1,
+    "explanation": "PTA forwards the authentication request through a lightweight on-prem agent that validates the password directly against AD DS in real time — no password hash is stored in Entra ID for PTA users. This is the key distinction from password hash sync (A describes PHS, not PTA), and validation isn't purely local-device (C) or skipped (D)."
+  },
+  {
+    "id": "q_d1_036",
+    "domain": "Implement and manage user identities",
+    "subtopic": "seamless_sso",
+    "question": "What problem does Seamless Single Sign-On (SSO) solve for hybrid identity users on a domain-joined, on-prem network?",
+    "options": [
+      "It eliminates the need for any authentication method (password hash sync or PTA) entirely",
+      "It automatically signs users in to Microsoft Entra ID resources when they're already signed in to their domain-joined corporate device, avoiding a repeated password prompt",
+      "It replaces Conditional Access policies",
+      "It only works for cloud-only (non-hybrid) accounts"
+    ],
+    "correctIndex": 1,
+    "explanation": "Seamless SSO works alongside password hash sync or PTA to silently authenticate users already signed in to a domain-joined device, avoiding redundant credential prompts on the corporate network — it doesn't remove the need for an underlying auth method (A is false), doesn't replace Conditional Access (C is false), and it's specifically a hybrid-identity feature, not for cloud-only accounts (D is false)."
+  },
+  {
+    "id": "q_d1_037",
+    "domain": "Implement and manage user identities",
+    "subtopic": "adfs_migration",
+    "question": "An organization currently uses AD FS for federated sign-in and wants to reduce on-premises infrastructure dependency by moving to a cloud-managed authentication method. Which migration path is most appropriate?",
+    "options": [
+      "Migrate to password hash synchronization or pass-through authentication (with Seamless SSO), retiring the AD FS federation servers",
+      "Migrate to Conditional Access named locations",
+      "Migrate all users to guest (B2B) accounts",
+      "There is no supported migration path away from AD FS"
+    ],
+    "correctIndex": 0,
+    "explanation": "Microsoft explicitly supports and documents migrating AD FS federation to password hash sync or pass-through authentication (paired with Seamless SSO), reducing the on-prem footprint. Named locations (B) are unrelated to authentication method migration, converting users to guests (C) would be a fundamentally different and inappropriate change, and a supported path absolutely exists, making D false."
+  },
+  {
+    "id": "q_d1_038",
+    "domain": "Implement and manage user identities",
+    "subtopic": "entra_connect_health",
+    "question": "What is the primary function of Microsoft Entra Connect Health?",
+    "options": [
+      "Monitoring the health, performance, and reliability of on-premises hybrid identity infrastructure components (like Connect Sync servers, AD FS servers, and domain controllers) with alerts",
+      "Encrypting synchronized password hashes",
+      "Managing license assignment for hybrid users",
+      "Providing a chat-based support agent for identity issues"
+    ],
+    "correctIndex": 0,
+    "explanation": "Connect Health provides monitoring, alerting, and usage analytics for hybrid identity infrastructure (sync servers, AD FS, domain controllers), helping admins catch issues like sync failures or AD FS downtime proactively. It isn't an encryption feature (B), licensing tool (C), or support chat product (D)."
+  },
+  {
+    "id": "q_d1_039",
+    "domain": "Implement and manage user identities",
+    "subtopic": "entra_connect_health",
+    "question": "An admin notices Connect Health alerts showing repeated sync errors for a subset of on-prem AD objects. What is the most likely underlying cause category these alerts help surface?",
+    "options": [
+      "Attribute conflicts, duplicate attribute values (e.g., duplicate UPN or proxyAddress), or objects violating Entra ID's schema/validation rules during sync",
+      "A billing issue with the Azure subscription",
+      "An expired SSL certificate on the tenant's custom domain's website",
+      "A misconfigured Conditional Access policy"
+    ],
+    "correctIndex": 0,
+    "explanation": "Connect Health sync error alerts most commonly point to data-quality issues on the on-prem side — duplicate or invalid attribute values that fail Entra ID's validation during sync. Billing (B), an unrelated website certificate (C), and Conditional Access policy misconfiguration (D) are not what sync-error alerts are diagnosing."
+  },
+  {
+    "id": "q_d1_040",
+    "domain": "Implement and manage user identities",
+    "subtopic": "external_identity_providers",
+    "question": "Which statement about configuring external identity providers for federation (SAML/WS-Fed) in Microsoft Entra External ID is accurate?",
+    "options": [
+      "Federation requires manually recreating every partner user as a local Entra account first",
+      "Federation lets users authenticate with their home organization's IdP credentials directly, with Entra trusting SAML/WS-Fed assertions from the configured external IdP",
+      "Only WS-Fed is supported; SAML federation is not available",
+      "Federated external IdPs can only be used for guest access to SharePoint, no other apps"
+    ],
+    "correctIndex": 1,
+    "explanation": "Configuring an external SAML/WS-Fed IdP establishes trust so Entra accepts assertions from that IdP directly — no local account duplication is required (A is false), both SAML and WS-Fed are supported protocols (C is false), and federated access isn't restricted to SharePoint-only scenarios (D is false)."
+  },
+  {
+    "id": "q_d2_001",
+    "domain": "Implement authentication and access management",
+    "subtopic": "plan_for_authentication",
+    "question": "When planning an authentication strategy for a mixed workforce (some fully remote, some in secure offices with managed devices), what is the most important first step?",
+    "options": [
+      "Immediately enable every available authentication method for every user",
+      "Inventory user populations, their device/network context, and risk tolerance, then map appropriate authentication methods and MFA requirements to each population",
+      "Disable all legacy authentication methods before assessing user needs",
+      "Purchase the highest-tier license SKU for all users regardless of role"
+    ],
+    "correctIndex": 1,
+    "explanation": "Good authentication planning starts with understanding who your users are, how/where they work, and the risk each population represents, then tailoring methods and policies accordingly. Enabling everything indiscriminately (A) creates confusion and unnecessary support burden, disabling legacy auth before understanding usage (C) could break things without assessment, and blanket licensing (D) doesn't address the actual planning question."
+  },
+  {
+    "id": "q_d2_002",
+    "domain": "Implement authentication and access management",
+    "subtopic": "authentication_methods_cba",
+    "question": "An organization wants smart-card-equivalent strong authentication for users without deploying physical smart cards. Which Microsoft Entra authentication method is designed for this?",
+    "options": [
+      "Self-service password reset",
+      "Certificate-based authentication (CBA), using X.509 certificates issued to users' devices",
+      "Company branding",
+      "Group-based licensing"
+    ],
+    "correctIndex": 1,
+    "explanation": "Certificate-based authentication lets Entra ID validate X.509 client certificates directly (cloud-native, no on-prem federation server required) as a phishing-resistant primary or MFA factor. SSPR (A), branding (C), and licensing (D) have nothing to do with certificate-based strong authentication."
+  },
+  {
+    "id": "q_d2_003",
+    "domain": "Implement authentication and access management",
+    "subtopic": "authentication_methods_tap",
+    "question": "A new hire needs to bootstrap Microsoft Authenticator and complete initial sign-in before they have any registered authentication methods. What feature is designed for exactly this scenario?",
+    "options": [
+      "Temporary Access Pass (TAP), a time-limited passcode an admin issues for initial or recovery sign-in",
+      "Self-service password reset",
+      "Windows Hello for Business",
+      "Passkeys (FIDO2)"
+    ],
+    "correctIndex": 0,
+    "explanation": "Temporary Access Pass is built for bootstrapping — a time-limited, admin-issued code that lets a user sign in and register their permanent authentication methods without already having one. SSPR (B) requires an existing method to verify identity first, Windows Hello (C) and passkeys (D) are end-state strong methods, not bootstrap mechanisms."
+  },
+  {
+    "id": "q_d2_004",
+    "domain": "Implement authentication and access management",
+    "subtopic": "authentication_methods_oauth",
+    "question": "In the context of Microsoft Entra ID authentication methods, what role do OAuth 2.0 tokens (access tokens, refresh tokens) play?",
+    "options": [
+      "They are used exclusively for password reset flows",
+      "They represent the credentials/proof of authentication and authorization that client apps present to access protected resources after a user or service successfully authenticates",
+      "They are a type of MFA hardware token",
+      "They replace the need for Conditional Access entirely"
+    ],
+    "correctIndex": 1,
+    "explanation": "OAuth 2.0 tokens are the artifacts issued after successful auth/consent that apps use to call APIs on the user's or app's behalf — they're a core part of the modern auth flow, not a password-reset mechanism (A), physical hardware (C), or a Conditional Access replacement (D)."
+  },
+  {
+    "id": "q_d2_005",
+    "domain": "Implement authentication and access management",
+    "subtopic": "authentication_methods_authenticator",
+    "question": "Which of the following is NOT a capability of the Microsoft Authenticator app in an Entra ID authentication context?",
+    "options": [
+      "Push notification approval for MFA",
+      "Passwordless phone sign-in",
+      "Number matching to reduce MFA fatigue/prompt-bombing attacks",
+      "Automatically provisioning new user accounts in bulk"
+    ],
+    "correctIndex": 3,
+    "explanation": "Microsoft Authenticator handles push-based MFA approval, passwordless phone sign-in, and number matching (a defense against MFA fatigue attacks) — all real capabilities (A, B, C). Bulk account provisioning (D) is an admin/directory management function, not something the Authenticator app does."
+  },
+  {
+    "id": "q_d2_006",
+    "domain": "Implement authentication and access management",
+    "subtopic": "authentication_methods_passkeys",
+    "question": "What security property makes passkeys (FIDO2) phishing-resistant compared to a password or SMS one-time code?",
+    "options": [
+      "Passkeys use a longer numeric code than SMS",
+      "Passkeys are cryptographically bound to the specific website/relying party they were registered for, so they cannot be entered on a lookalike phishing site",
+      "Passkeys require a VPN connection to function",
+      "Passkeys expire after 24 hours, unlike passwords"
+    ],
+    "correctIndex": 1,
+    "explanation": "FIDO2/passkey authentication is origin-bound — the cryptographic challenge-response only works against the legitimate relying party domain, so a phishing site simply can't complete the handshake even if a user is tricked into visiting it. Code length (A), VPN requirement (C), and expiration timing (D) aren't what makes passkeys phishing-resistant."
+  },
+  {
+    "id": "q_d2_007",
+    "domain": "Implement authentication and access management",
+    "subtopic": "mfa_tenant_settings",
+    "question": "Where would an admin configure which MFA methods (e.g., Authenticator push, SMS, voice call) are available tenant-wide for users to register?",
+    "options": [
+      "Authentication methods policy in Microsoft Entra ID",
+      "Company branding settings",
+      "Administrative units",
+      "Custom security attribute definitions"
+    ],
+    "correctIndex": 0,
+    "explanation": "The Authentication methods policy is the tenant-wide control surface for enabling/disabling and scoping which MFA/authentication methods users are allowed to register and use. Branding (B), administrative units (C), and custom attributes (D) don't govern which auth methods are available."
+  },
+  {
+    "id": "q_d2_008",
+    "domain": "Implement authentication and access management",
+    "subtopic": "sspr",
+    "question": "What is a prerequisite for a user to be able to successfully use self-service password reset (SSPR)?",
+    "options": [
+      "The user must have Global Administrator rights",
+      "SSPR must be enabled for the user (or their group) at the tenant level, and the user must have registered the required number of authentication methods for reset",
+      "The user's device must be Microsoft Entra joined",
+      "The organization must be using AD FS"
+    ],
+    "correctIndex": 1,
+    "explanation": "SSPR requires tenant-level enablement (targeting specific users/groups or all users) plus the user having registered enough verified methods to meet the configured combined registration requirement. It has nothing to do with admin rights (A), device join state (C), or AD FS (D — SSPR works independent of federation choice, though writeback to on-prem AD is a separate related setting)."
+  },
+  {
+    "id": "q_d2_009",
+    "domain": "Implement authentication and access management",
+    "subtopic": "sspr",
+    "question": "A hybrid organization wants a password reset performed via Entra SSPR to also update the user's on-premises Active Directory password. What must be enabled?",
+    "options": [
+      "SSPR writeback (password writeback) to on-premises Active Directory, typically via Entra Connect Sync or Cloud Sync",
+      "Nothing extra — SSPR automatically updates on-prem AD",
+      "Seamless SSO",
+      "Company branding"
+    ],
+    "correctIndex": 0,
+    "explanation": "Password writeback is a distinct, explicitly-enabled feature that pushes an SSPR-driven password change back down to on-prem AD via the sync engine — it doesn't happen automatically without enabling it (B is false), and it's unrelated to Seamless SSO (C) or branding (D)."
+  },
+  {
+    "id": "q_d2_010",
+    "domain": "Implement authentication and access management",
+    "subtopic": "windows_hello_business",
+    "question": "What authentication factor does Windows Hello for Business primarily rely on?",
+    "options": [
+      "A shared secret transmitted over the network at every sign-in, similar to a traditional password",
+      "A cryptographic key pair bound to the specific device, unlocked locally by a PIN or biometric (never transmitted over the network)",
+      "A physical smart card that must be inserted at every sign-in",
+      "An SMS code sent to the user's registered phone"
+    ],
+    "correctIndex": 1,
+    "explanation": "Windows Hello for Business provisions an asymmetric key pair tied to the device's TPM; the private key is unlocked locally via PIN/biometric and never leaves the device or crosses the network, unlike a shared-secret password (A). It doesn't require a physical smart card insertion (C) and isn't SMS-based (D)."
+  },
+  {
+    "id": "q_d2_011",
+    "domain": "Implement authentication and access management",
+    "subtopic": "disable_accounts_revoke_sessions",
+    "question": "An employee is terminated immediately. Blocking their sign-in alone may not be enough because they already have active, unexpired sessions/tokens on multiple devices. What additional action should the admin take?",
+    "options": [
+      "Nothing further is needed once sign-in is blocked",
+      "Revoke the user's active refresh tokens/sessions (e.g., via 'Revoke sessions' or Continuous Access Evaluation-triggered revocation) so already-issued tokens stop working promptly",
+      "Delete the user's mailbox only",
+      "Change the tenant's default domain"
+    ],
+    "correctIndex": 1,
+    "explanation": "Blocking future sign-in doesn't invalidate tokens already issued to active sessions; explicitly revoking sessions/refresh tokens is necessary to cut off access from devices that are already signed in. Deleting only the mailbox (C) doesn't address directory/app session access, and changing the default domain (D) is unrelated and disruptive."
+  },
+  {
+    "id": "q_d2_012",
+    "domain": "Implement authentication and access management",
+    "subtopic": "entra_password_protection",
+    "question": "What does Microsoft Entra Password Protection primarily do?",
+    "options": [
+      "Encrypts all stored passwords with a stronger algorithm",
+      "Blocks users from setting passwords that match a global Microsoft banned-password list plus a customizable organization-specific banned list (and can extend enforcement to on-premises AD via a proxy/DC agent)",
+      "Automatically resets any password older than 90 days",
+      "Provides passwordless sign-in for all users automatically"
+    ],
+    "correctIndex": 1,
+    "explanation": "Password Protection checks new/changed passwords against Microsoft's global banned list and a custom organization list (like company name variations), rejecting weak or predictable choices, and can be extended on-premises via the Password Protection Proxy and DC agent. It's not about encryption algorithm changes (A), automatic expiry-based resets (C), or blanket passwordless enablement (D)."
+  },
+  {
+    "id": "q_d2_013",
+    "domain": "Implement authentication and access management",
+    "subtopic": "entra_kerberos_hybrid",
+    "question": "What problem does Microsoft Entra Kerberos solve for hybrid identity organizations that have moved away from AD FS or PTA/PHS-only authentication?",
+    "options": [
+      "It replaces the need for on-premises Active Directory entirely",
+      "It allows Microsoft Entra ID to issue Kerberos service tickets (via a special Entra Kerberos computer object) so hybrid users can access on-premises resources that require Kerberos (like file shares) using cloud-driven authentication such as Windows Hello for Business",
+      "It is used only for encrypting SharePoint Online documents",
+      "It removes the need for any authentication method registration"
+    ],
+    "correctIndex": 1,
+    "explanation": "Entra Kerberos bridges cloud-based authentication (e.g., Windows Hello for Business) to on-prem Kerberos-dependent resources by letting Entra ID issue valid Kerberos tickets via a dedicated computer object in AD — it doesn't eliminate on-prem AD (A is false), isn't a SharePoint-specific encryption feature (C), and doesn't remove registration requirements (D)."
+  },
+  {
+    "id": "q_d2_014",
+    "domain": "Implement authentication and access management",
+    "subtopic": "ca_plan_policies",
+    "question": "When planning Conditional Access policies, what is the recommended approach to avoid accidentally locking all admins out of the tenant?",
+    "options": [
+      "Enable 'block all access' policies immediately in enforced mode for every user including admins",
+      "Use report-only mode to test policy impact first, and always exclude at least one break-glass/emergency access account from restrictive policies",
+      "Never use Conditional Access for admin accounts",
+      "Apply Conditional Access only to guest users, never to employees"
+    ],
+    "correctIndex": 1,
+    "explanation": "Best practice is to validate policies in report-only mode before enforcing, and to maintain excluded break-glass accounts so a policy misconfiguration can't lock out all administrative access. Immediately enforcing block-all policies (A) is how lockouts happen, entirely exempting admins from Conditional Access (C) creates a security gap, and restricting CA to guests only (D) ignores the much larger population of regular users needing protection."
+  },
+  {
+    "id": "q_d2_015",
+    "domain": "Implement authentication and access management",
+    "subtopic": "ca_policy_assignments",
+    "question": "In a Conditional Access policy, what does the 'Assignments' section define?",
+    "options": [
+      "Which controls (block, grant with MFA, etc.) are applied",
+      "The scope of who and what the policy applies to — users/groups, cloud apps or actions, and conditions like device platform, location, or sign-in risk",
+      "The billing account charged for the policy",
+      "The custom branding shown during sign-in"
+    ],
+    "correctIndex": 1,
+    "explanation": "Assignments define the WHO/WHAT/WHEN scope of a policy (target users/groups, target apps, and conditions), separate from the Access Controls section which defines the resulting grant/block/session actions. Billing (C) and branding (D) are unrelated to CA policy structure."
+  },
+  {
+    "id": "q_d2_016",
+    "domain": "Implement authentication and access management",
+    "subtopic": "ca_policy_controls",
+    "question": "A Conditional Access policy is configured with grant controls requiring 'Require multifactor authentication' AND 'Require compliant device', with the control-combination logic set to 'Require all the selected controls'. What must a user satisfy to be granted access?",
+    "options": [
+      "Either MFA or a compliant device, whichever is easier",
+      "Both MFA AND a compliant device must be satisfied",
+      "Neither is actually enforced unless a third control is also added",
+      "Only a compliant device; MFA is ignored when device compliance is also selected"
+    ],
+    "correctIndex": 1,
+    "explanation": "When grant controls are combined with 'require all', every selected control must be individually satisfied — access isn't granted with just one satisfied (A is false), the controls are enforced as configured without needing a third (C is false), and MFA is not silently ignored (D is false)."
+  },
+  {
+    "id": "q_d2_017",
+    "domain": "Implement authentication and access management",
+    "subtopic": "ca_testing_troubleshooting",
+    "question": "An admin wants to see which Conditional Access policies would have applied to a hypothetical sign-in (specific user, app, location) without actually enforcing anything yet. What tool should they use?",
+    "options": [
+      "The 'What If' tool in Conditional Access",
+      "Company branding preview",
+      "Access reviews simulation",
+      "PIM audit history"
+    ],
+    "correctIndex": 0,
+    "explanation": "The Conditional Access 'What If' tool simulates policy evaluation for a given set of sign-in conditions, showing which policies would apply, without requiring an actual sign-in or report-only enforcement. Branding preview (B), access review simulation (C), and PIM audit history (D) don't provide this kind of hypothetical CA evaluation."
+  },
+  {
+    "id": "q_d2_018",
+    "domain": "Implement authentication and access management",
+    "subtopic": "ca_testing_troubleshooting",
+    "question": "After enabling a new Conditional Access policy, several users report unexpected sign-in blocks. What is the best first troubleshooting step?",
+    "options": [
+      "Immediately delete the policy without investigation",
+      "Review the Sign-in logs for the affected users, checking which Conditional Access policies applied and why access was denied (the 'Conditional Access' tab on the sign-in event)",
+      "Reset the affected users' passwords",
+      "Disable Conditional Access for the entire tenant"
+    ],
+    "correctIndex": 1,
+    "explanation": "Sign-in logs show exactly which policies evaluated to what result for a specific sign-in attempt, making them the fastest way to diagnose an unexpected block. Deleting the policy outright (A) or disabling CA tenant-wide (D) are overcorrections that remove protection without understanding the cause, and resetting passwords (C) doesn't address a policy-evaluation issue."
+  },
+  {
+    "id": "q_d2_019",
+    "domain": "Implement authentication and access management",
+    "subtopic": "ca_session_management",
+    "question": "Which Conditional Access session control would force a user to re-authenticate periodically during a long browser session, even if their token would otherwise still be valid?",
+    "options": [
+      "Sign-in frequency",
+      "Company branding",
+      "Custom security attributes",
+      "Password protection"
+    ],
+    "correctIndex": 0,
+    "explanation": "Sign-in frequency is a session control that forces re-authentication after a configured time period, overriding the default token lifetime behavior. Branding (B), custom attributes (C), and password protection (D) are unrelated session controls."
+  },
+  {
+    "id": "q_d2_020",
+    "domain": "Implement authentication and access management",
+    "subtopic": "ca_device_restrictions",
+    "question": "An organization wants to block access to a sensitive app from any device that is not marked compliant in Intune, regardless of user identity risk. What Conditional Access approach fits?",
+    "options": [
+      "A grant control requiring 'Require device to be marked as compliant', targeting the sensitive app",
+      "A sign-in risk policy in ID Protection only",
+      "A session control limiting file download only",
+      "A named location restricting by country"
+    ],
+    "correctIndex": 0,
+    "explanation": "Requiring the device-compliance grant control directly enforces the 'must be Intune-compliant' requirement for the targeted app, independent of user risk signals. A pure sign-in risk policy (B) evaluates risk, not device compliance; download restriction (C) and country-based named locations (D) don't address the compliance requirement described."
+  },
+  {
+    "id": "q_d2_021",
+    "domain": "Implement authentication and access management",
+    "subtopic": "continuous_access_evaluation",
+    "question": "What problem does Continuous Access Evaluation (CAE) address compared to traditional token-lifetime-based access control?",
+    "options": [
+      "It makes access tokens last indefinitely so users never have to sign in again",
+      "It enables near-real-time revocation of access (e.g., when a user is disabled, password changed, or high sign-in risk detected) instead of waiting for the access token to naturally expire",
+      "It replaces Conditional Access policies entirely",
+      "It only applies to on-premises applications"
+    ],
+    "correctIndex": 1,
+    "explanation": "CAE-enabled services/apps receive near-real-time signals (like account disablement, password reset, or detected risk) and can revoke access immediately rather than waiting up to the token's full lifetime to expire — it doesn't make tokens last forever (A is false, that's the opposite goal), doesn't replace Conditional Access (C — it complements it), and specifically targets cloud-connected CAE-aware services, not classic on-prem-only apps (D)."
+  },
+  {
+    "id": "q_d2_022",
+    "domain": "Implement authentication and access management",
+    "subtopic": "authentication_context",
+    "question": "An organization wants to require step-up MFA only when a user tries to open a specific highly sensitive SharePoint document library, not for general SharePoint access. What Conditional Access feature enables this granular, action-specific targeting?",
+    "options": [
+      "Named locations",
+      "Authentication context, tagged on the sensitive resource (e.g., via a sensitivity label) and referenced in a targeted Conditional Access policy",
+      "Company branding",
+      "Custom security attribute definitions"
+    ],
+    "correctIndex": 1,
+    "explanation": "Authentication context lets you define specific 'auth context' tags that can be attached to sensitive resources/actions (like a sensitivity label on a document library) and then targeted with their own Conditional Access policy — providing far more granularity than app-wide policies. Named locations (A) address network location, not resource sensitivity, and branding (C) / custom attributes (D) don't provide this targeting mechanism."
+  },
+  {
+    "id": "q_d2_023",
+    "domain": "Implement authentication and access management",
+    "subtopic": "protected_actions",
+    "question": "What are 'protected actions' in the context of Microsoft Entra Conditional Access?",
+    "options": [
+      "A list of blocked IP addresses",
+      "Specific high-impact administrative permissions/tasks (like updating Conditional Access policies themselves or federation settings) that can require additional Conditional Access enforcement (like step-up authentication) before they can be performed",
+      "A category of licensed apps only available to E5 tenants",
+      "A synonym for access reviews"
+    ],
+    "correctIndex": 1,
+    "explanation": "Protected actions let admins require extra Conditional Access enforcement (e.g., phishing-resistant MFA) before a sensitive administrative action can be performed, adding a safeguard against a compromised admin session being used to weaken security controls. It's not an IP blocklist (A), an app-licensing category (C), or the same thing as access reviews (D)."
+  },
+  {
+    "id": "q_d2_024",
+    "domain": "Implement authentication and access management",
+    "subtopic": "ca_template",
+    "question": "What is the benefit of creating a Conditional Access policy from a Microsoft-provided template rather than building one entirely from scratch?",
+    "options": [
+      "Templates automatically enforce the policy in production with no review needed",
+      "Templates provide a pre-built, Microsoft-recommended baseline configuration (e.g., 'Require MFA for admins') that an admin can review, customize, and then enable — reducing setup time and the chance of missing a best-practice control",
+      "Templates can only be used by Global Administrators and no one else",
+      "Templates remove the need for any user or group assignment"
+    ],
+    "correctIndex": 1,
+    "explanation": "CA policy templates give a vetted starting point aligned to common best-practice scenarios, which admins still review/customize before enabling — they aren't auto-enforced without review (A is false), aren't restricted to only Global Administrators among eligible CA-capable roles (C is an overstatement), and still require normal assignment configuration (D is false)."
+  },
+  {
+    "id": "q_d2_025",
+    "domain": "Implement authentication and access management",
+    "subtopic": "id_protection_user_risk",
+    "question": "Microsoft Entra ID Protection flags a user as 'high user risk' due to leaked credentials found in a known breach. What is an appropriate policy response using ID Protection or Conditional Access?",
+    "options": [
+      "Ignore the flag since leaked credential detections are usually false positives",
+      "Require the user to securely change their password (self-remediation) or block access until an admin resolves it, via a user risk-based Conditional Access policy",
+      "Immediately and permanently delete the user's account",
+      "Disable Conditional Access for that user going forward"
+    ],
+    "correctIndex": 1,
+    "explanation": "A user-risk policy can require secure password change as self-remediation (or block access pending investigation) when leaked-credential risk is detected — this is a real, high-confidence signal, not something to dismiss (A is false). Permanent deletion (C) is a wildly disproportionate response, and disabling Conditional Access for a risky user (D) is the opposite of an appropriate response."
+  },
+  {
+    "id": "q_d2_026",
+    "domain": "Implement authentication and access management",
+    "subtopic": "id_protection_signin_risk",
+    "question": "What distinguishes 'sign-in risk' from 'user risk' in Microsoft Entra ID Protection?",
+    "options": [
+      "They are the same signal, just named differently in different portals",
+      "Sign-in risk evaluates the likelihood that a specific sign-in attempt is not the legitimate user (e.g., unfamiliar location, anonymized IP, impossible travel); user risk evaluates the probability that the user's identity itself has been compromised (e.g., leaked credentials), aggregated across the account over time",
+      "User risk only applies to guest accounts",
+      "Sign-in risk can only be evaluated for hybrid identities"
+    ],
+    "correctIndex": 1,
+    "explanation": "Sign-in risk is a per-sign-in-event evaluation (real-time signals like impossible travel or anonymized IP), while user risk is an account-level, longer-horizon assessment (like confirmed leaked credentials) — they're distinct signals feeding different but related risk policies. They aren't the same thing under different names (A is false), user risk isn't guest-only (C is false), and sign-in risk isn't limited to hybrid identities (D is false)."
+  },
+  {
+    "id": "q_d2_027",
+    "domain": "Implement authentication and access management",
+    "subtopic": "mfa_registration_campaigns",
+    "question": "An admin wants to proactively nudge users who haven't yet registered Microsoft Authenticator to do so, without forcing an abrupt requirement change. What Entra ID feature is designed for this?",
+    "options": [
+      "Authentication methods registration campaign, which prompts eligible users to set up a stronger method (like Authenticator) during sign-in over time",
+      "Immediately deleting their account if not registered within 24 hours",
+      "Company branding change",
+      "Access reviews targeting registration status"
+    ],
+    "correctIndex": 0,
+    "explanation": "Registration campaigns are purpose-built to nudge users toward registering a specific stronger authentication method during normal sign-in, gradually improving MFA coverage. Account deletion (B) is a wildly disproportionate non-feature, branding (C) is cosmetic, and access reviews (D) govern access grants, not method registration nudging."
+  },
+  {
+    "id": "q_d2_028",
+    "domain": "Implement authentication and access management",
+    "subtopic": "monitor_risky_users_signins",
+    "question": "Where would an administrator go to see a consolidated, filterable list of currently flagged risky users and risky sign-ins for investigation?",
+    "options": [
+      "The Risky users and Risky sign-ins reports in Microsoft Entra ID Protection",
+      "Company branding settings",
+      "License assignment reports",
+      "Administrative unit membership list"
+    ],
+    "correctIndex": 0,
+    "explanation": "ID Protection's Risky users and Risky sign-ins reports are the dedicated views for reviewing, filtering, and acting on detected risk (confirm compromised, dismiss, remediate). None of the other options (branding, license reports, AU membership) surface risk detection data."
+  },
+  {
+    "id": "q_d2_029",
+    "domain": "Implement authentication and access management",
+    "subtopic": "remediate_risky_users",
+    "question": "An investigation confirms a flagged 'risky user' was genuinely compromised. What is the recommended remediation sequence?",
+    "options": [
+      "Do nothing further since the risk was already flagged automatically",
+      "Confirm the user as compromised in ID Protection, force a secure password reset/revoke sessions, and investigate for further impact (e.g., mailbox rules, OAuth app consents granted by the attacker)",
+      "Immediately delete the user's account with no investigation of downstream impact",
+      "Only change the user's display name"
+    ],
+    "correctIndex": 1,
+    "explanation": "Proper remediation includes confirming the compromise (which trains the risk model), forcing credential reset and session revocation, and checking for attacker persistence mechanisms like malicious inbox rules or rogue app consents — doing nothing (A) leaves the account exposed, outright deletion without investigation (C) can destroy forensic evidence and disrupt business continuity unnecessarily, and a display name change (D) does nothing for security."
+  },
+  {
+    "id": "q_d2_030",
+    "domain": "Implement authentication and access management",
+    "subtopic": "monitor_risky_workload_identities",
+    "question": "Microsoft Entra ID Protection can also flag risk for workload identities (service principals/apps), not just human users. What kind of signal commonly triggers a workload identity risk detection?",
+    "options": [
+      "The service principal's client secret or certificate being used from an unfamiliar location or leaked in a public code repository",
+      "The workload identity's display name being changed",
+      "The workload identity being assigned a new custom security attribute",
+      "The workload identity's Company branding logo changing"
+    ],
+    "correctIndex": 0,
+    "explanation": "Workload identity risk detections focus on anomalous credential usage patterns — like sign-ins from atypical locations or credentials found exposed in public repos — which indicate the app's credentials may be compromised. Display name changes (B), custom attribute assignment (C), and branding (D) aren't risk signals for workload identities."
+  },
+  {
+    "id": "q_d2_031",
+    "domain": "Implement authentication and access management",
+    "subtopic": "gsa_clients",
+    "question": "What is the Global Secure Access Client used for?",
+    "options": [
+      "It's the endpoint agent installed on user devices that routes traffic to Microsoft's Security Service Edge (SSE) so Global Secure Access policies (Private Access, Internet Access) can be enforced",
+      "It is a server-side proxy installed only in Azure",
+      "It replaces the need for Conditional Access",
+      "It is a licensing management tool"
+    ],
+    "correctIndex": 0,
+    "explanation": "The Global Secure Access Client is the device-side agent that forwards relevant traffic into Microsoft's Security Service Edge so Global Secure Access policies can inspect and enforce identity-aware network access — it's not a server-only proxy (B), doesn't replace Conditional Access (C, which it actually integrates with), and isn't a licensing tool (D)."
+  },
+  {
+    "id": "q_d2_032",
+    "domain": "Implement authentication and access management",
+    "subtopic": "gsa_private_access",
+    "question": "What does Microsoft Entra Private Access (part of Global Secure Access) primarily provide?",
+    "options": [
+      "Identity-aware, Zero Trust access to private/on-premises applications and resources without requiring a traditional full-tunnel VPN",
+      "Antivirus scanning for email attachments",
+      "Company branding for the sign-in page",
+      "License assignment automation"
+    ],
+    "correctIndex": 0,
+    "explanation": "Private Access delivers Zero Trust Network Access to internal/private resources (replacing traditional VPN-style broad network access) with identity- and Conditional-Access-aware per-app access. It has nothing to do with antivirus scanning (B), branding (C), or license automation (D)."
+  },
+  {
+    "id": "q_d2_033",
+    "domain": "Implement authentication and access management",
+    "subtopic": "gsa_internet_access",
+    "question": "What is the primary purpose of Microsoft Entra Internet Access (part of Global Secure Access)?",
+    "options": [
+      "Providing a Secure Web Gateway (SWG) that applies identity-aware security policies to general internet-bound and SaaS traffic",
+      "Managing on-premises Active Directory replication",
+      "Configuring custom domains for the tenant",
+      "Assigning administrative unit membership"
+    ],
+    "correctIndex": 0,
+    "explanation": "Internet Access is Microsoft's identity-aware Secure Web Gateway component, applying policy-based filtering and protection to general internet and SaaS-bound traffic. It's unrelated to AD replication (B), custom domain configuration (C), or administrative unit membership (D)."
+  },
+  {
+    "id": "q_d2_034",
+    "domain": "Implement authentication and access management",
+    "subtopic": "gsa_internet_access_m365",
+    "question": "An organization specifically wants optimized, secured, and identity-aware routing for Microsoft 365 traffic (Teams, Exchange Online, SharePoint) through Global Secure Access. What should they deploy?",
+    "options": [
+      "Internet Access for Microsoft 365, a purpose-built profile optimized for M365 traffic within Global Secure Access",
+      "Private Access only, since M365 is technically a private resource",
+      "A completely separate third-party SWG product, since Entra doesn't support this",
+      "Company branding customization"
+    ],
+    "correctIndex": 0,
+    "explanation": "Global Secure Access includes an Internet Access profile specifically tuned for Microsoft 365 traffic, balancing performance and security for that traffic class. M365 is a cloud SaaS service, not a private/on-prem resource, so Private Access (B) is the wrong fit, Entra does support this natively so C is false, and branding (D) is irrelevant."
+  },
+  {
+    "id": "q_d2_035",
+    "domain": "Implement authentication and access management",
+    "subtopic": "ca_plan_policies",
+    "question": "What is a 'break-glass' or emergency access account used for in the context of Conditional Access planning?",
+    "options": [
+      "A shared account with no password, used by all employees for convenience",
+      "A tightly controlled, highly monitored account excluded from restrictive Conditional Access policies, reserved for use only if normal admin access is unexpectedly locked out",
+      "A guest account for external vendors",
+      "An account automatically created for every new hire"
+    ],
+    "correctIndex": 1,
+    "explanation": "Break-glass accounts are a deliberate safety valve — excluded from CA policies and heavily monitored/alerted on any use — so a policy misconfiguration or MFA outage can't permanently lock administrators out of their own tenant. It's not a shared convenience account (A), not for vendors (C), and not something auto-created per new hire (D)."
+  },
+  {
+    "id": "q_d2_036",
+    "domain": "Implement authentication and access management",
+    "subtopic": "ca_policy_controls",
+    "question": "A Conditional Access policy uses grant controls set to 'Require one of the selected controls' with both 'Require MFA' and 'Require compliant device' selected. What is required for access?",
+    "options": [
+      "Both MFA and compliant device are mandatory together",
+      "Satisfying just one of the two — either MFA or a compliant device — is sufficient",
+      "Neither control is enforced under 'require one'",
+      "Only compliant device satisfies the policy; MFA is ignored"
+    ],
+    "correctIndex": 1,
+    "explanation": "'Require one of the selected controls' is an OR condition — satisfying any single selected control is enough to be granted access, unlike 'require all' which needs every control satisfied. Both being mandatory (A) describes the AND logic instead, and neither being enforced (C) or MFA being ignored outright (D) are incorrect."
+  },
+  {
+    "id": "q_d2_037",
+    "domain": "Implement authentication and access management",
+    "subtopic": "disable_accounts_revoke_sessions",
+    "question": "Which PowerShell/Graph capability would an admin use to immediately revoke all of a specific user's currently active refresh tokens across all their signed-in sessions?",
+    "options": [
+      "Revoke-MgUserSignInSession (or the equivalent 'Revoke sessions' action in the portal)",
+      "Update-MgUserLicense",
+      "New-MgGroup",
+      "Set-MgDomain"
+    ],
+    "correctIndex": 0,
+    "explanation": "Revoking sign-in sessions invalidates a user's refresh tokens tenant-wide, forcing re-authentication everywhere. License updates (B), group creation (C), and domain configuration (D) have no bearing on active session/token state."
+  },
+  {
+    "id": "q_d2_038",
+    "domain": "Implement authentication and access management",
+    "subtopic": "entra_password_protection",
+    "question": "A global admin adds 'ContosoFall2026' to the custom banned password list. What is the practical effect?",
+    "options": [
+      "Users can no longer use any password containing that string or close fuzzy-matching variants of it, whether on cloud or (if the on-prem proxy/agent is deployed) on-premises password changes",
+      "The string is only blocked for the Global Administrator's own account",
+      "The banned list has no effect until the tenant is upgraded to a higher license tier",
+      "The password immediately becomes the required password for all new accounts"
+    ],
+    "correctIndex": 0,
+    "explanation": "Custom banned list entries are checked (with fuzzy matching for common substitutions) against any password set by any in-scope user, cloud or on-prem (if the proxy is deployed) — it's not scoped to just the admin who added it (B), doesn't require a specific extra license tier beyond what's already needed for the feature (C), and doesn't set any password as required (D, which misunderstands what a banned list does)."
+  },
+  {
+    "id": "q_d2_039",
+    "domain": "Implement authentication and access management",
+    "subtopic": "mfa_tenant_settings",
+    "question": "What is the difference between 'Security defaults' and a custom Conditional Access-based MFA policy?",
+    "options": [
+      "They are functionally and configurably identical",
+      "Security defaults are a simple, free, one-size-fits-all baseline (e.g., requiring MFA for all users) with minimal customization, while Conditional Access policies allow granular, tenant-specific rules (per app, per group, per risk level, etc.) but typically require an Entra ID P1/P2 license",
+      "Security defaults require a P2 license, while Conditional Access is always free",
+      "Security defaults can only be enabled after Conditional Access is fully configured"
+    ],
+    "correctIndex": 1,
+    "explanation": "Security defaults are Microsoft's straightforward, broadly-applied baseline protection intended for organizations without premium licensing, while Conditional Access offers much finer-grained control but generally needs Entra ID P1 or higher. The licensing direction in C is reversed, and they aren't identical (A) or sequentially dependent as described in D."
+  },
+  {
+    "id": "q_d2_040",
+    "domain": "Implement authentication and access management",
+    "subtopic": "continuous_access_evaluation",
+    "question": "Which of the following is a real-time event that Continuous Access Evaluation (CAE) is designed to react to almost immediately, rather than waiting for token expiry?",
+    "options": [
+      "A scheduled quarterly access review completing",
+      "A user account being disabled by an admin",
+      "A company branding logo update",
+      "A new custom security attribute definition being created"
+    ],
+    "correctIndex": 1,
+    "explanation": "CAE reacts to critical events like account disablement, password reset, or detected high user risk by prompting near-real-time re-evaluation/revocation for CAE-aware services. Access review completion (A), branding updates (C), and attribute definition creation (D) aren't the kind of critical security events CAE is built to react to instantly."
+  },
+  {
+    "id": "q_d3_001",
+    "domain": "Plan and implement workload identities",
+    "subtopic": "select_identity_type",
+    "question": "An Azure Function needs to read secrets from Azure Key Vault at runtime with no credentials stored in code or config. What identity type is the best-practice choice?",
+    "options": [
+      "A shared user account with a hardcoded password in the function's app settings",
+      "A system-assigned or user-assigned managed identity, which Azure automatically manages credentials for with no secrets to store",
+      "A service principal with a manually created, long-lived client secret stored in a config file",
+      "A personal Global Administrator account used by the developer"
+    ],
+    "correctIndex": 1,
+    "explanation": "Managed identities are Azure's purpose-built solution for exactly this scenario — Azure handles credential issuance/rotation automatically, eliminating stored secrets entirely. A hardcoded password (A) and a manually stored client secret (C) both create secret-management risk, and using a personal admin account (D) is a severe security anti-pattern mixing human and workload identity."
+  },
+  {
+    "id": "q_d3_002",
+    "domain": "Plan and implement workload identities",
+    "subtopic": "select_identity_type",
+    "question": "What is the key difference between a system-assigned and a user-assigned managed identity?",
+    "options": [
+      "There is no difference, they behave identically in all cases",
+      "A system-assigned identity's lifecycle is tied directly to the single Azure resource it's created for (deleted when the resource is deleted), while a user-assigned identity is a standalone resource that can be assigned to multiple Azure resources and outlives any one of them",
+      "User-assigned identities can only be used with virtual machines",
+      "System-assigned identities can be shared across resources, while user-assigned identities cannot"
+    ],
+    "correctIndex": 1,
+    "explanation": "System-assigned identities live and die with their host resource, while user-assigned identities are independently managed and can be attached to multiple resources — the reverse of what option D claims. They aren't identical (A), and user-assigned identities work with many resource types, not just VMs (C)."
+  },
+  {
+    "id": "q_d3_003",
+    "domain": "Plan and implement workload identities",
+    "subtopic": "select_identity_type",
+    "question": "An application runs outside of Azure (e.g., on-premises or in another cloud) but needs to authenticate to Microsoft Entra ID to call Microsoft Graph. Since managed identities are Azure-resource-bound, what identity should be used instead?",
+    "options": [
+      "A service principal (app registration) with its own credential — a certificate or client secret — used in a client-credentials OAuth flow",
+      "A managed identity forced onto the external server",
+      "A personal user account shared by the app",
+      "No identity is needed if the app only reads public data"
+    ],
+    "correctIndex": 0,
+    "explanation": "Managed identities require an Azure-hosted resource to attach to, so workloads outside Azure use a standard app registration/service principal authenticating with a certificate or secret via the client-credentials flow. Managed identity can't be 'forced' onto non-Azure infrastructure (B), sharing a personal account for an app is a security anti-pattern (C), and calling Graph still requires an authenticated identity even for reads (D)."
+  },
+  {
+    "id": "q_d3_004",
+    "domain": "Plan and implement workload identities",
+    "subtopic": "create_managed_identity",
+    "question": "How does an admin create a system-assigned managed identity for an Azure App Service?",
+    "options": [
+      "By manually registering an app in Microsoft Entra ID and copying its client secret into the App Service",
+      "By enabling the 'System assigned' managed identity toggle directly on the App Service resource, which causes Azure to automatically create and manage the underlying service principal",
+      "Managed identities cannot be created for App Service, only for virtual machines",
+      "By assigning an Entra role to the App Service's resource group"
+    ],
+    "correctIndex": 1,
+    "explanation": "System-assigned managed identities are enabled with a simple toggle directly on the supporting resource (like App Service); Azure creates and lifecycle-manages the backing service principal automatically — no manual app registration or secret copying is involved (A is false), App Service is one of many supported resource types beyond VMs (C is false), and role assignment to a resource group is a separate downstream step, not identity creation itself (D)."
+  },
+  {
+    "id": "q_d3_005",
+    "domain": "Plan and implement workload identities",
+    "subtopic": "assign_managed_identity",
+    "question": "After creating a user-assigned managed identity, what additional step is required before a virtual machine can actually use it?",
+    "options": [
+      "Nothing further — creation automatically attaches it to every VM in the subscription",
+      "The user-assigned identity must be explicitly assigned/attached to the specific VM resource",
+      "The VM must be restarted with a new OS image",
+      "The identity must be manually entered as a login credential inside the VM's OS"
+    ],
+    "correctIndex": 1,
+    "explanation": "A user-assigned managed identity exists as an independent resource and must be explicitly attached to each VM (or other resource) that should use it — it doesn't auto-attach tenant-wide (A is false), doesn't require a VM restart with a new image (C is false), and isn't used as an in-OS login credential (D is false — it's used via the Azure Instance Metadata Service endpoint)."
+  },
+  {
+    "id": "q_d3_006",
+    "domain": "Plan and implement workload identities",
+    "subtopic": "use_managed_identity_access",
+    "question": "A VM with a managed identity needs to read blobs from an Azure Storage account. Besides having the managed identity attached to the VM, what else must be configured?",
+    "options": [
+      "Nothing else — attaching the identity automatically grants access to every Azure resource in the tenant",
+      "An appropriate Azure RBAC role assignment (e.g., Storage Blob Data Reader) granting the managed identity's principal permission on the storage account",
+      "A Conditional Access policy targeting the storage account",
+      "A custom security attribute on the storage account"
+    ],
+    "correctIndex": 1,
+    "explanation": "Managed identities still need explicit Azure RBAC role assignments on the target resource to actually have permission — attaching the identity alone grants no access anywhere (A is false). Conditional Access (C) governs interactive user sign-in scenarios, not this kind of resource-to-resource Azure RBAC authorization, and custom security attributes (D) don't grant data-plane permissions."
+  },
+  {
+    "id": "q_d3_007",
+    "domain": "Plan and implement workload identities",
+    "subtopic": "use_managed_identity_access",
+    "question": "What is the typical mechanism an application code uses to actually retrieve a token for its managed identity at runtime?",
+    "options": [
+      "The developer manually copies a token from the Azure portal into the app's config file",
+      "The app calls the local Azure Instance Metadata Service (IMDS) endpoint (or uses an SDK like Azure.Identity's DefaultAzureCredential/ManagedIdentityCredential), which handles token acquisition and caching transparently",
+      "The app prompts the end user to sign in interactively",
+      "The app reads the token from a plaintext file checked into source control"
+    ],
+    "correctIndex": 1,
+    "explanation": "Managed identity token acquisition happens automatically through the local metadata endpoint (or an SDK credential class wrapping it) — no manual copying (A), no interactive user prompt (C, since this is a non-interactive workload identity), and certainly no plaintext token in source control (D, which would defeat the entire purpose of avoiding stored secrets)."
+  },
+  {
+    "id": "q_d3_008",
+    "domain": "Plan and implement workload identities",
+    "subtopic": "select_identity_type",
+    "question": "What is a managed service account, and how does it differ from a managed identity in Microsoft Entra ID?",
+    "options": [
+      "They are the exact same concept with different names",
+      "A managed service account (e.g., a Group Managed Service Account, gMSA) is an on-premises Active Directory construct for automatic password management of service accounts running Windows services; a Microsoft Entra managed identity is a cloud-native Azure resource identity — they solve a similar 'no manual credential management' goal but in different environments",
+      "Managed service accounts only exist in Microsoft Entra ID, never in on-premises AD",
+      "Managed identities require a service account to be created first in AD"
+    ],
+    "correctIndex": 1,
+    "explanation": "gMSAs are a long-standing on-prem AD feature for automatic credential rotation of Windows service accounts, conceptually similar in goal to managed identities but implemented entirely differently in a different environment — they are not the same construct (A is false), gMSAs originate in on-prem AD, not Entra ID (C is false), and Entra managed identities have no dependency on an AD service account existing first (D is false)."
+  },
+  {
+    "id": "q_d3_009",
+    "domain": "Plan and implement workload identities",
+    "subtopic": "enterprise_app_settings",
+    "question": "What is the difference between application-level and tenant-level settings for an enterprise application in Microsoft Entra ID?",
+    "options": [
+      "There is no distinction; all settings apply identically everywhere",
+      "Application-level settings (like sign-in behavior, user assignment requirement, and app roles) apply only to that specific application, while tenant-level settings (like whether users can consent to apps at all) apply organization-wide across all applications",
+      "Tenant-level settings can only be configured by the application's original developer",
+      "Application-level settings always override tenant-level settings, even security-restrictive ones"
+    ],
+    "correctIndex": 1,
+    "explanation": "Application-level configuration scopes to one specific enterprise app, while tenant-level settings (like the user consent policy) act as an organization-wide governance layer — real distinction exists (A is false). Tenant-level settings aren't developer-restricted (C is false, they're an Entra admin capability) and app-level settings can't simply override a tenant-wide restrictive consent policy (D is false)."
+  },
+  {
+    "id": "q_d3_010",
+    "domain": "Plan and implement workload identities",
+    "subtopic": "enterprise_app_roles",
+    "question": "Which built-in Microsoft Entra role is scoped specifically to managing enterprise application registrations and their assignments, without full Global Administrator rights?",
+    "options": [
+      "Application Administrator (or the more limited Cloud Application Administrator)",
+      "Billing Administrator",
+      "Compliance Administrator",
+      "Exchange Administrator"
+    ],
+    "correctIndex": 0,
+    "explanation": "Application Administrator (and its Cloud Application Administrator variant, which excludes on-prem app proxy management) is purpose-built for managing app registrations and enterprise app configuration without granting broader Global Administrator rights. Billing (B), Compliance (C), and Exchange (D) Administrator roles are scoped to entirely different areas."
+  },
+  {
+    "id": "q_d3_011",
+    "domain": "Plan and implement workload identities",
+    "subtopic": "app_proxy_onprem",
+    "question": "An organization wants remote employees to securely access an internal, on-premises web application without a traditional VPN, using their existing Entra ID sign-in. What should they configure?",
+    "options": [
+      "Microsoft Entra Application Proxy, publishing the on-prem app with a lightweight connector installed on-premises",
+      "A brand-new SaaS rewrite of the application",
+      "A Conditional Access named location covering all remote IP ranges",
+      "A user-assigned managed identity attached to the on-prem server"
+    ],
+    "correctIndex": 0,
+    "explanation": "Application Proxy is specifically designed to expose on-premises web apps externally through Entra ID authentication via a lightweight connector, without requiring a full VPN or app rewrite. Rewriting the app as SaaS (B) isn't necessary or implied by the requirement, named locations alone (C) don't provide the actual proxy/publishing mechanism, and managed identities (D) are for Azure workload authentication, not remote user access to on-prem apps."
+  },
+  {
+    "id": "q_d3_012",
+    "domain": "Plan and implement workload identities",
+    "subtopic": "saas_integration",
+    "question": "What is generally the fastest way to integrate a well-known SaaS application (e.g., a popular CRM) with Microsoft Entra ID for SSO and provisioning?",
+    "options": [
+      "Always build a custom SAML app registration from scratch, even if the app is already in the gallery",
+      "Search the Microsoft Entra application gallery for the pre-integrated SaaS app, which typically includes pre-configured SSO and, where supported, automated SCIM provisioning",
+      "Use Microsoft Entra Application Proxy, since it's the only way to connect any external app",
+      "Manually recreate every SaaS user as a separate Entra guest account with no federation"
+    ],
+    "correctIndex": 1,
+    "explanation": "The application gallery contains thousands of pre-integrated apps with ready-made SSO configuration templates and often SCIM-based automatic provisioning, dramatically speeding up integration versus building from scratch (A) unnecessarily. Application Proxy (C) is specifically for on-prem apps, not the general SaaS integration method, and manually recreating disconnected guest accounts (D) defeats the purpose of federated SSO."
+  },
+  {
+    "id": "q_d3_013",
+    "domain": "Plan and implement workload identities",
+    "subtopic": "assign_classify_manage_users",
+    "question": "An enterprise app has 'User assignment required' set to Yes. What is the effect on who can access it?",
+    "options": [
+      "Any authenticated tenant user can access the app regardless of assignment",
+      "Only users (or members of groups) explicitly assigned to the app can access it — unassigned users are blocked even if they'd otherwise be able to authenticate",
+      "This setting only affects the app's icon visibility on the My Apps portal, not actual access",
+      "It disables Conditional Access for that app"
+    ],
+    "correctIndex": 1,
+    "explanation": "'User assignment required' enforces that only explicitly assigned users/groups can actually access the app, providing an authorization gate beyond mere authentication — it doesn't just affect portal icon visibility (C is false, that's a cosmetic side effect at most) and has no bearing on Conditional Access applicability (D is false). Without this setting enabled, any authenticated user in the tenant generally could access it, which is the opposite of A being the effect when the setting IS enabled."
+  },
+  {
+    "id": "q_d3_014",
+    "domain": "Plan and implement workload identities",
+    "subtopic": "assign_classify_manage_users",
+    "question": "What are app roles used for when assigning users or groups to an enterprise application?",
+    "options": [
+      "App roles let the application receive information about what level of access/permission the assigned user or group should have inside the app itself (e.g., 'Reader' vs 'Admin'), via a claim in the issued token",
+      "App roles control the tenant's Company branding for that app",
+      "App roles are only used for licensing purposes, unrelated to authorization",
+      "App roles replace the need for Conditional Access policies on that app"
+    ],
+    "correctIndex": 0,
+    "explanation": "App roles are defined by the app (in its manifest/registration) and assigned to users/groups, then surfaced as a roles claim in the token so the app itself can make in-app authorization decisions. They have no relationship to branding (B), aren't purely a licensing concept (C), and don't substitute for Conditional Access (D, which governs access conditions rather than in-app authorization)."
+  },
+  {
+    "id": "q_d3_015",
+    "domain": "Plan and implement workload identities",
+    "subtopic": "consent_management",
+    "question": "What is the difference between user consent and admin consent for an application requesting API permissions?",
+    "options": [
+      "They are identical; both require the same approval process",
+      "User consent lets an individual user approve permissions on their own behalf (often limited to lower-risk, non-admin-consent-required permissions); admin consent is granted by an administrator on behalf of the entire organization (or specific users/groups), often required for higher-privilege permissions",
+      "User consent always applies organization-wide automatically",
+      "Admin consent can only be granted by the app's original developer"
+    ],
+    "correctIndex": 1,
+    "explanation": "User consent is an individual, self-service grant (restricted by policy for higher-risk permissions), while admin consent is an organization-wide (or scoped) grant made deliberately by an administrator, often mandatory for higher-privilege scopes — real functional distinction exists (A is false). User consent doesn't apply org-wide (C is false, that's what admin consent does), and admin consent isn't restricted to the app's developer, it's an Entra administrative action (D is false)."
+  },
+  {
+    "id": "q_d3_016",
+    "domain": "Plan and implement workload identities",
+    "subtopic": "consent_management",
+    "question": "An organization wants to prevent users from ever granting consent to third-party apps requesting access to organizational data, requiring all such requests to go through IT review. What should be configured?",
+    "options": [
+      "Restrict user consent settings in Microsoft Entra ID (e.g., set to 'Do not allow user consent') and route requests through an admin consent workflow",
+      "Delete all existing enterprise applications",
+      "Enable Seamless SSO",
+      "Disable Microsoft Entra Connect Sync"
+    ],
+    "correctIndex": 0,
+    "explanation": "Restricting user consent settings (down to 'do not allow user consent') combined with an admin consent request workflow is exactly the supported approach for centralizing app consent decisions with IT. Deleting existing apps (B) is destructive and unrelated, and Seamless SSO (C) / Connect Sync (D) have nothing to do with consent governance."
+  },
+  {
+    "id": "q_d3_017",
+    "domain": "Plan and implement workload identities",
+    "subtopic": "app_collections",
+    "question": "What is the purpose of application collections in the Microsoft Entra My Apps portal?",
+    "options": [
+      "Grouping related enterprise applications together for easier end-user discovery and organization on the My Apps portal (e.g., a 'Finance Apps' collection)",
+      "Automatically deleting unused applications after 90 days",
+      "Encrypting application secrets at rest",
+      "Assigning Conditional Access policies in bulk"
+    ],
+    "correctIndex": 0,
+    "explanation": "App collections are an organizational/UX feature that groups related apps for easier end-user discovery in the My Apps launcher — they aren't a cleanup/deletion mechanism (B), a secret-encryption feature (C, which Microsoft always handles regardless), or a Conditional Access bulk-assignment tool (D)."
+  },
+  {
+    "id": "q_d3_018",
+    "domain": "Plan and implement workload identities",
+    "subtopic": "enterprise_app_roles",
+    "question": "Which role would be most appropriate to assign to a team lead who should be able to manage consent grants and app assignments for enterprise apps, but should NOT be able to manage Application Proxy connectors or app registrations' authentication settings?",
+    "options": [
+      "Global Administrator",
+      "Cloud Application Administrator (which excludes Application Proxy management, unlike the broader Application Administrator role)",
+      "Security Reader",
+      "Exchange Administrator"
+    ],
+    "correctIndex": 1,
+    "explanation": "Cloud Application Administrator was created specifically to grant most Application Administrator capabilities while excluding on-premises Application Proxy management, matching this exact 'not Application Proxy' requirement. Global Administrator (A) is far broader than needed, Security Reader (C) is read-only and wouldn't allow making changes, and Exchange Administrator (D) is unrelated to enterprise app management."
+  },
+  {
+    "id": "q_d3_019",
+    "domain": "Plan and implement workload identities",
+    "subtopic": "plan_app_registrations",
+    "question": "What is the first thing to determine when planning a new app registration for a custom line-of-business application?",
+    "options": [
+      "The app's Company branding logo",
+      "What identity platform capabilities the app needs (e.g., which OAuth/OIDC flows, single- vs multi-tenant, required API permissions) and who the intended sign-in audience is",
+      "How many licenses to purchase for the Azure subscription",
+      "Which administrative unit the app registration belongs to, since this is mandatory"
+    ],
+    "correctIndex": 1,
+    "explanation": "Planning starts with understanding the app's actual identity needs — supported account types, required flows, and what APIs/permissions it must call — which shapes every subsequent configuration decision. Branding (A) is a cosmetic detail, license purchasing (C) isn't the first planning question, and administrative unit assignment for app registrations isn't a mandatory planning step (D)."
+  },
+  {
+    "id": "q_d3_020",
+    "domain": "Plan and implement workload identities",
+    "subtopic": "create_app_registrations",
+    "question": "When creating a new app registration, what does the 'Supported account types' setting control?",
+    "options": [
+      "Which programming language the app must be written in",
+      "Whether the app can be used only by accounts in the home tenant (single-tenant), any Microsoft Entra tenant (multi-tenant), and/or personal Microsoft accounts",
+      "The app's maximum number of registered users",
+      "Whether the app supports dark mode in its UI"
+    ],
+    "correctIndex": 1,
+    "explanation": "Supported account types defines the sign-in audience boundary for the app registration — single-tenant, multi-tenant, and/or personal Microsoft accounts — a foundational identity-scope decision. It has nothing to do with programming language (A), a user-count cap (C), or UI theming (D)."
+  },
+  {
+    "id": "q_d3_021",
+    "domain": "Plan and implement workload identities",
+    "subtopic": "configure_app_authentication",
+    "question": "A single-page application (SPA) needs to authenticate users without exposing a client secret in browser-executable JavaScript. What authentication configuration is appropriate?",
+    "options": [
+      "Configure a confidential client with a long-lived client secret embedded directly in the JavaScript bundle",
+      "Configure the app registration's platform as a Single-page application, using the authorization code flow with PKCE (no client secret required, since SPAs are public clients)",
+      "Use the resource owner password credentials (ROPC) flow with the secret hardcoded",
+      "Disable authentication entirely for simplicity"
+    ],
+    "correctIndex": 1,
+    "explanation": "SPAs are public clients that can't securely hold a secret, so Entra's SPA platform configuration uses authorization code flow with PKCE, which doesn't require a client secret. Embedding a secret in browser JS (A) is a critical security flaw, ROPC with a hardcoded secret (C) compounds the same problem and is discouraged generally, and disabling authentication (D) isn't a real option for a secured app."
+  },
+  {
+    "id": "q_d3_022",
+    "domain": "Plan and implement workload identities",
+    "subtopic": "configure_app_authentication",
+    "question": "What is a redirect URI in the context of app registration authentication configuration?",
+    "options": [
+      "The URL the app's authentication server sends billing invoices to",
+      "The URL(s) that Microsoft Entra ID is allowed to send the authentication response (tokens/codes) back to after a user signs in — a security-critical allowlist that must exactly match what the app requests",
+      "The app's support contact email",
+      "A DNS record proving domain ownership"
+    ],
+    "correctIndex": 1,
+    "explanation": "Redirect URIs are the explicit allowlist of destinations Entra ID will send auth responses to, preventing tokens/codes from being redirected to an attacker-controlled URL — a core OAuth/OIDC security control. It's not a billing address (A), support contact (C), or DNS ownership record (D, which is a separate custom-domain-verification concept)."
+  },
+  {
+    "id": "q_d3_023",
+    "domain": "Plan and implement workload identities",
+    "subtopic": "configure_api_permissions",
+    "question": "What is the difference between delegated permissions and application permissions when configuring API permissions on an app registration?",
+    "options": [
+      "They are functionally identical",
+      "Delegated permissions act on behalf of a signed-in user (limited by that user's own rights); application permissions let the app act as itself with no signed-in user, typically requiring admin consent and carrying broader standing access",
+      "Delegated permissions always require admin consent, while application permissions never do",
+      "Application permissions can only be used by Microsoft first-party apps"
+    ],
+    "correctIndex": 1,
+    "explanation": "Delegated permissions are exercised in the context of, and limited by, a signed-in user; application permissions grant the app its own standing identity/access with no user context, generally requiring admin consent since they can be broader. This is a real, important distinction (A is false), the admin-consent requirement pattern in C is reversed/oversimplified (delegated perms can also require admin consent for higher-privilege scopes), and application permissions are available to any properly consented app, not just Microsoft's own (D is false)."
+  },
+  {
+    "id": "q_d3_024",
+    "domain": "Plan and implement workload identities",
+    "subtopic": "create_app_roles",
+    "question": "A developer defines two app roles, 'Reader' and 'Approver', on their app registration. How does an admin actually grant a specific user the 'Approver' role?",
+    "options": [
+      "App roles are automatically granted to every user who signs in for the first time",
+      "Through the enterprise application's 'Users and groups' assignment blade, assigning the user (or a group they belong to) with the specific 'Approver' role selected",
+      "By editing the user's password policy",
+      "By adding the user to a Conditional Access named location called 'Approver'"
+    ],
+    "correctIndex": 1,
+    "explanation": "Once app roles are defined in the app registration, they're actually assigned to specific users/groups from the corresponding enterprise application's assignment blade — they aren't auto-granted to all sign-ins (A is false), unrelated to password policy (C), and have nothing to do with Conditional Access named locations (D)."
+  },
+  {
+    "id": "q_d3_025",
+    "domain": "Plan and implement workload identities",
+    "subtopic": "defender_cloud_discovery",
+    "question": "An organization wants to discover which unsanctioned SaaS apps ('Shadow IT') employees are already using, based on network/proxy traffic logs. What Defender for Cloud Apps capability supports this?",
+    "options": [
+      "Cloud Discovery, which analyzes uploaded traffic logs (or Defender for Endpoint signals) to identify and risk-score apps in use across the organization",
+      "Conditional Access session controls",
+      "Microsoft Entra Connect Health",
+      "Company branding analytics"
+    ],
+    "correctIndex": 0,
+    "explanation": "Cloud Discovery is specifically built to surface unsanctioned app usage by analyzing traffic log data (or endpoint-collected signals), assigning each discovered app a risk score. Session controls (B) act after an app is already sanctioned/connected, Connect Health (C) monitors hybrid identity infrastructure, and branding analytics (D) doesn't exist in this context."
+  },
+  {
+    "id": "q_d3_026",
+    "domain": "Plan and implement workload identities",
+    "subtopic": "defender_connected_apps",
+    "question": "What must be done before Defender for Cloud Apps can enforce real-time session policies (like blocking downloads) for a specific sanctioned SaaS app?",
+    "options": [
+      "Nothing, session policies work for any app automatically with no connection step",
+      "The app must be connected to Defender for Cloud Apps (via an API connector for out-of-band visibility, and/or Conditional Access App Control for real-time session control) so Defender can actually intercept or inspect its traffic/activity",
+      "The app must be removed from the Entra application gallery",
+      "The tenant's default domain must be changed"
+    ],
+    "correctIndex": 1,
+    "explanation": "Real-time session enforcement specifically requires routing the app's session through Conditional Access App Control (a reverse-proxy mechanism), separate from just having an API connector for retrospective visibility — this connection step is mandatory, not automatic (A is false). Removing the app from the gallery (C) or changing the default domain (D) have no bearing on enabling session control."
+  },
+  {
+    "id": "q_d3_027",
+    "domain": "Plan and implement workload identities",
+    "subtopic": "defender_app_enforced_restrictions",
+    "question": "What are 'app-enforced restrictions' in the context of Conditional Access and Defender for Cloud Apps (as opposed to Conditional Access App Control)?",
+    "options": [
+      "A legacy, app-native mechanism (supported by a small set of Microsoft apps like SharePoint/Exchange Online) where the app itself limits functionality (e.g., blocking downloads) based on a signal from Conditional Access, without routing traffic through a reverse proxy",
+      "A synonym for Conditional Access App Control with no real difference",
+      "A feature only available for on-premises applications",
+      "A billing restriction preventing app purchases"
+    ],
+    "correctIndex": 0,
+    "explanation": "App-enforced restrictions are a lighter-weight, app-native mechanism supported by specific first-party apps where the app itself reads a Conditional Access session signal and restricts its own behavior — distinct from the reverse-proxy-based Conditional Access App Control, so they aren't the same thing (B is false). This applies to cloud SaaS apps like Exchange/SharePoint Online, not on-prem apps specifically (C is false), and it's unrelated to billing (D)."
+  },
+  {
+    "id": "q_d3_028",
+    "domain": "Plan and implement workload identities",
+    "subtopic": "ca_app_control",
+    "question": "What underlying mechanism allows Conditional Access App Control (via Defender for Cloud Apps) to monitor and control a user's session in real time, including blocking specific actions?",
+    "options": [
+      "A reverse-proxy architecture that routes the user's session through Defender for Cloud Apps after Conditional Access redirects it there, allowing real-time inspection and control of the session",
+      "A one-time scan of the app's source code",
+      "A DNS-level block of the app's domain",
+      "A change to the app registration's redirect URI"
+    ],
+    "correctIndex": 0,
+    "explanation": "Conditional Access App Control works by routing the session through a reverse proxy after Conditional Access hands off control, giving Defender for Cloud Apps real-time visibility and enforcement over that session's activity. It's not a static source-code scan (B), a DNS block (C), or a redirect URI change (D)."
+  },
+  {
+    "id": "q_d3_029",
+    "domain": "Plan and implement workload identities",
+    "subtopic": "defender_access_session_policies",
+    "question": "What is the difference between an 'access policy' and a 'session policy' in Defender for Cloud Apps?",
+    "options": [
+      "They are identical concepts under different UI labels",
+      "An access policy makes a coarse allow/block decision at the start of a session (e.g., block access entirely from an unmanaged device); a session policy allows finer-grained, in-session control (e.g., allow access but block downloads) once the session is already permitted to start",
+      "Access policies only apply to mobile apps",
+      "Session policies can only block MFA, nothing else"
+    ],
+    "correctIndex": 1,
+    "explanation": "Access policies gate whether a session is allowed to start at all, while session policies apply more granular controls within an already-permitted session — a real and important distinction (A is false). Neither is restricted to mobile-only apps (C is false) nor limited to just MFA-blocking behavior (D is false, session policies commonly control things like download/upload/paste restrictions)."
+  },
+  {
+    "id": "q_d3_030",
+    "domain": "Plan and implement workload identities",
+    "subtopic": "defender_oauth_app_policies",
+    "question": "An organization wants to automatically flag or revoke OAuth app grants that request excessive permissions (e.g., full mailbox access) from a low-reputation third-party app. What Defender for Cloud Apps feature addresses this?",
+    "options": [
+      "OAuth app policies, which can alert on or automatically govern (including revoking) risky OAuth app permission grants",
+      "Company branding policies",
+      "Administrative unit scoping",
+      "Password protection banned list"
+    ],
+    "correctIndex": 0,
+    "explanation": "OAuth app policies in Defender for Cloud Apps are specifically designed to monitor and govern third-party OAuth grants, including automated revocation of risky ones based on configured criteria. Branding (B), AU scoping (C), and the password banned list (D) have no relevance to OAuth app permission governance."
+  },
+  {
+    "id": "q_d3_031",
+    "domain": "Plan and implement workload identities",
+    "subtopic": "defender_cloud_app_catalog",
+    "question": "What is the Cloud app catalog in Defender for Cloud Apps used for?",
+    "options": [
+      "A searchable repository of thousands of known cloud apps with pre-assessed risk scores and compliance attributes, used to evaluate and manage apps discovered via Cloud Discovery",
+      "A catalog of Azure VM images",
+      "A list of Conditional Access templates",
+      "A directory of Microsoft support phone numbers"
+    ],
+    "correctIndex": 0,
+    "explanation": "The Cloud app catalog holds Microsoft's continuously updated risk assessments for a huge number of known cloud apps, letting admins quickly evaluate discovered apps (via Cloud Discovery) against real risk/compliance criteria rather than researching each one manually. It's unrelated to VM images (B), CA templates (C), or support contact directories (D)."
+  },
+  {
+    "id": "q_d3_032",
+    "domain": "Plan and implement workload identities",
+    "subtopic": "select_identity_type",
+    "question": "A CI/CD pipeline running in a third-party cloud needs to deploy resources into Azure using an identity trusted via federated credentials (no stored secret), authenticating through an app registration. What feature enables this secretless, cross-cloud trust?",
+    "options": [
+      "Password hash synchronization",
+      "Workload identity federation (federated credentials on an app registration), which trusts tokens issued by an external OIDC provider (like GitHub Actions or another cloud's identity provider) without a stored client secret",
+      "Seamless SSO",
+      "Windows Hello for Business"
+    ],
+    "correctIndex": 1,
+    "explanation": "Workload identity federation lets an app registration trust OIDC tokens from an external identity provider (GitHub Actions, other clouds, Kubernetes, etc.), enabling secretless, short-lived-token-based authentication for external workloads — exactly this scenario. Password hash sync (A), Seamless SSO (C), and Windows Hello for Business (D) are all human-authentication-focused hybrid identity features, unrelated to workload federation."
+  },
+  {
+    "id": "q_d3_033",
+    "domain": "Plan and implement workload identities",
+    "subtopic": "assign_classify_manage_users",
+    "question": "An organization wants to classify enterprise applications by data sensitivity (e.g., 'Confidential', 'Public') for governance and reporting purposes. What Entra ID capability best supports tagging apps this way?",
+    "options": [
+      "Custom security attributes, which can be defined and applied to applications (and other object types) as structured metadata",
+      "Redirect URIs",
+      "Client secrets",
+      "API permissions"
+    ],
+    "correctIndex": 0,
+    "explanation": "Custom security attributes are the general-purpose tagging/metadata mechanism that can be applied to applications for classification purposes like sensitivity labeling, later usable in reporting or access decisions. Redirect URIs (B), client secrets (C), and API permissions (D) are unrelated app-authentication configuration elements, not classification metadata."
+  },
+  {
+    "id": "q_d3_034",
+    "domain": "Plan and implement workload identities",
+    "subtopic": "enterprise_app_settings",
+    "question": "What tenant-level setting would prevent ANY user (even with otherwise-permitted user consent) from consenting to apps requesting high-privilege 'admin consent required' permissions?",
+    "options": [
+      "This is inherently enforced by Entra ID — permissions marked as requiring admin consent can never be granted through user consent, regardless of user consent settings",
+      "Company branding restrictions",
+      "Named locations",
+      "Custom security attribute definitions"
+    ],
+    "correctIndex": 0,
+    "explanation": "Permissions that Microsoft (or the API publisher) marks as requiring admin consent are never grantable through ordinary user consent, no matter how permissive the tenant's user consent setting is — this is an inherent platform safeguard, not something achieved via branding (B), named locations (C), or custom attributes (D), which are all unrelated to consent enforcement."
+  },
+  {
+    "id": "q_d3_035",
+    "domain": "Plan and implement workload identities",
+    "subtopic": "create_app_registrations",
+    "question": "A developer accidentally deletes an app registration that was actively used in production. What is the recommended immediate recovery step within the supported time window?",
+    "options": [
+      "The app registration is unrecoverable the instant it's deleted",
+      "Restore it from the Deleted applications view in Microsoft Entra ID, which retains deleted app registrations for a limited recovery window (similar to deleted user recovery)",
+      "Recreate an entirely new app registration and manually guess the same Application (client) ID",
+      "Contact Microsoft Support to manually recreate the exact same GUID from scratch with no retention window involved"
+    ],
+    "correctIndex": 1,
+    "explanation": "Microsoft Entra ID retains deleted app registrations in a 'Deleted applications' view for a limited window, allowing restoration much like deleted user/group recovery — it isn't instantly and permanently gone (A is false). The Application (client) ID can't be manually guessed or reused on a new registration (C is false — a new registration always gets a new ID), and there's a defined self-service recovery window rather than requiring Microsoft Support intervention as the only path (D is false)."
+  },
+  {
+    "id": "q_d3_036",
+    "domain": "Plan and implement workload identities",
+    "subtopic": "configure_api_permissions",
+    "question": "An app registration requests the Microsoft Graph delegated permission 'User.Read'. What does this specific permission allow the app to do?",
+    "options": [
+      "Read and modify every user's profile in the tenant with no restriction",
+      "Read the basic profile of the currently signed-in user only, in the context of that user's own delegated access",
+      "Create new user accounts in bulk",
+      "Delete any user account in the directory"
+    ],
+    "correctIndex": 1,
+    "explanation": "User.Read (delegated) is intentionally narrow — it lets the app read the signed-in user's own basic profile, nothing about other users, and grants no write/create/delete capability. Reading/modifying every user tenant-wide (A), bulk user creation (C), and account deletion (D) all require much broader, higher-privilege permissions than User.Read grants."
+  },
+  {
+    "id": "q_d3_037",
+    "domain": "Plan and implement workload identities",
+    "subtopic": "saas_integration",
+    "question": "A SaaS app supports SCIM-based automatic user provisioning from Microsoft Entra ID. What is the primary benefit of enabling this over manual account creation in the SaaS app?",
+    "options": [
+      "It eliminates the need for the app to ever be assigned to any users",
+      "It automatically creates, updates, and deactivates accounts in the SaaS app based on Entra ID assignment/attribute changes, keeping the SaaS app's user data in sync without manual admin work",
+      "It removes the need for the app to be in the Entra application gallery",
+      "It automatically grants Global Administrator to every provisioned user"
+    ],
+    "correctIndex": 1,
+    "explanation": "SCIM provisioning automates the full account lifecycle (create/update/deactivate) in the target SaaS app based on Entra ID state, eliminating manual, error-prone, and often-forgotten account cleanup. It doesn't remove the need for assignment (A is false — provisioning is often driven by assignment), doesn't require gallery removal (C is unrelated), and certainly doesn't grant Global Administrator to provisioned users (D, which would be a severe and false claim)."
+  },
+  {
+    "id": "q_d3_038",
+    "domain": "Plan and implement workload identities",
+    "subtopic": "defender_cloud_discovery",
+    "question": "Cloud Discovery assigns a risk score to a discovered unsanctioned app. What kind of factors typically feed into that score?",
+    "options": [
+      "Only the app's alphabetical name",
+      "Compliance certifications, data-handling practices, known vulnerabilities, and other risk/trust attributes tracked in the Cloud app catalog for that app",
+      "The number of letters in the app's URL",
+      "The app's stock price if publicly traded"
+    ],
+    "correctIndex": 1,
+    "explanation": "Risk scoring draws on real trust/compliance signals (certifications, known security posture, data practices) tracked in the catalog for each known app. Alphabetical name (A), URL length (C), and stock price (D) are not meaningful risk factors and aren't used."
+  },
+  {
+    "id": "q_d3_039",
+    "domain": "Plan and implement workload identities",
+    "subtopic": "select_identity_type",
+    "question": "Why is a shared, standing service principal with a long-lived client secret generally considered riskier than a managed identity for an Azure-hosted workload?",
+    "options": [
+      "There is no meaningful risk difference between the two approaches",
+      "The client secret is a static credential that must be stored, rotated manually, and could leak (e.g., via source control or logs), whereas a managed identity's credentials are automatically issued and rotated by Azure with nothing for a developer to store or leak",
+      "Managed identities cost significantly more to operate",
+      "Service principals cannot be granted any Azure RBAC roles at all"
+    ],
+    "correctIndex": 1,
+    "explanation": "The core risk difference is credential handling: a manually stored secret is a persistent leak/rotation liability, while managed identities remove that burden entirely by having Azure manage credentials transparently. There is a real, meaningful risk difference (A is false), managed identities don't carry a special cost premium as the deciding factor here (C is a fabricated claim), and service principals absolutely can be granted Azure RBAC roles just like managed identities (D is false)."
+  },
+  {
+    "id": "q_d3_040",
+    "domain": "Plan and implement workload identities",
+    "subtopic": "defender_connected_apps",
+    "question": "What is the difference between connecting an app to Defender for Cloud Apps via an API connector versus via Conditional Access App Control?",
+    "options": [
+      "They provide identical real-time enforcement capability",
+      "An API connector provides out-of-band, retrospective visibility and governance (scanning activity/content after the fact via the app's own API), while Conditional Access App Control provides real-time, in-session proxy-based control",
+      "API connectors are only available for on-premises apps",
+      "Conditional Access App Control requires no Conditional Access policy at all to function"
+    ],
+    "correctIndex": 1,
+    "explanation": "API connectors work after the fact by calling the SaaS app's own API to review activity/content (useful for retrospective governance), while App Control intercepts the live session in real time via the reverse-proxy mechanism — genuinely different capabilities, not identical ones (A is false). API connectors target cloud SaaS apps generally, not just on-prem ones (C is false), and App Control is specifically invoked through a Conditional Access policy, so it does require one (D is false)."
+  },
+  {
+    "id": "q_d4_001",
+    "domain": "Plan and automate identity governance",
+    "subtopic": "plan_entitlements",
+    "question": "When planning entitlement management for a large organization with many teams needing different bundles of app/group access, what is the recommended first step?",
+    "options": [
+      "Immediately create hundreds of individual access packages before defining any structure",
+      "Identify logical resource groupings and catalogs (e.g., by department or project), then design access packages that bundle the specific resources each user population actually needs, with appropriate approval and expiration policies",
+      "Give every employee Global Administrator to avoid access requests entirely",
+      "Disable entitlement management and rely solely on manual group additions"
+    ],
+    "correctIndex": 1,
+    "explanation": "Good entitlement management planning starts with a deliberate catalog/access-package structure mapped to real business needs, including who approves and how long access lasts. Creating packages ad hoc with no structure (A) creates sprawl, granting Global Administrator broadly (C) is a severe security anti-pattern, and abandoning entitlement management for manual processes (D) defeats the purpose of governance automation."
+  },
+  {
+    "id": "q_d4_002",
+    "domain": "Plan and automate identity governance",
+    "subtopic": "catalogs",
+    "question": "What is a catalog in Microsoft Entra entitlement management?",
+    "options": [
+      "A container that groups related resources (like groups, apps, and SharePoint sites) together so they can be packaged into access packages, often delegated to a specific catalog owner",
+      "A list of banned passwords",
+      "A report of all sign-in activity",
+      "A synonym for an administrative unit"
+    ],
+    "correctIndex": 0,
+    "explanation": "Catalogs organize related resources for reuse across access packages and can be delegated to non-admin catalog owners (e.g., a department lead) to manage independently. They aren't a banned password list (B), a sign-in report (C), or the same construct as an administrative unit (D, which scopes admin delegation over users/groups/devices rather than grouping resources for access packages)."
+  },
+  {
+    "id": "q_d4_003",
+    "domain": "Plan and automate identity governance",
+    "subtopic": "access_packages",
+    "question": "An access package is configured with a policy requiring manager approval and an assignment duration of 90 days with no auto-extension. What happens when a user's access reaches day 90?",
+    "options": [
+      "Access continues indefinitely with no further action needed",
+      "Access automatically expires at day 90 unless the user submits a new request (or the policy is reconfigured to allow extension) before then",
+      "The user is immediately promoted to a higher access package",
+      "The manager is deleted from the directory"
+    ],
+    "correctIndex": 1,
+    "explanation": "Without auto-extension enabled, an access package assignment expires exactly at its configured duration, requiring a fresh request/approval to regain access — access doesn't continue indefinitely by default (A is false) and expiration doesn't grant a promotion (C) or take any destructive action against the approver (D, which is a nonsensical outcome)."
+  },
+  {
+    "id": "q_d4_004",
+    "domain": "Plan and automate identity governance",
+    "subtopic": "access_requests",
+    "question": "Where does a user go to request access to a package they don't currently have?",
+    "options": [
+      "The My Access portal, where eligible users can browse and request available access packages",
+      "The Azure Cost Management portal",
+      "The Company branding settings page",
+      "The PIM audit history view"
+    ],
+    "correctIndex": 0,
+    "explanation": "My Access is the dedicated self-service portal where users discover and request access packages they're eligible for. Cost Management (B), branding settings (C), and PIM audit history (D) are unrelated portals/features for entirely different purposes."
+  },
+  {
+    "id": "q_d4_005",
+    "domain": "Plan and automate identity governance",
+    "subtopic": "terms_of_use",
+    "question": "An organization wants users to explicitly accept a data handling policy document before they can access a sensitive application, with a record kept of who accepted and when. What Entra ID governance feature supports this?",
+    "options": [
+      "Terms of use (ToU), which can be required as part of a Conditional Access policy and tracks per-user acceptance records",
+      "Company branding",
+      "Custom security attributes",
+      "Group-based licensing"
+    ],
+    "correctIndex": 0,
+    "explanation": "Terms of use is purpose-built for exactly this — presenting a PDF policy document, requiring explicit acceptance (often via Conditional Access), and retaining an auditable acceptance report. Branding (B), custom attributes (C), and group-based licensing (D) don't provide document-acceptance tracking."
+  },
+  {
+    "id": "q_d4_006",
+    "domain": "Plan and automate identity governance",
+    "subtopic": "external_user_lifecycle",
+    "question": "An organization invites many B2B guest users for time-limited projects but worries about stale guest accounts accumulating indefinitely after projects end. What combination of features addresses this lifecycle concern?",
+    "options": [
+      "Access packages with expiration policies (so guest access naturally expires) combined with periodic access reviews targeting guest users to catch/remove any that weren't cleanly offboarded",
+      "Company branding customization for guest users",
+      "Increasing the tenant's license count",
+      "Disabling B2B collaboration entirely"
+    ],
+    "correctIndex": 0,
+    "explanation": "Time-bound access packages plus recurring access reviews specifically targeting guests form the standard lifecycle management pattern for external users, catching stragglers that expiration alone might miss. Branding (B) is cosmetic, adding licenses (C) doesn't address lifecycle governance, and disabling B2B entirely (D) is a disproportionate response that eliminates a legitimate collaboration capability rather than managing it."
+  },
+  {
+    "id": "q_d4_007",
+    "domain": "Plan and automate identity governance",
+    "subtopic": "connected_organizations",
+    "question": "What is the purpose of configuring a 'connected organization' in entitlement management?",
+    "options": [
+      "It pre-establishes a relationship with an external partner organization's domain(s) or tenant, so users from that organization can be more easily targeted and discovered as requestors for access packages before they've been individually invited as guests",
+      "It automatically merges the two tenants into one",
+      "It is required before any Conditional Access policy can be created",
+      "It replaces the need for cross-tenant access settings entirely"
+    ],
+    "correctIndex": 0,
+    "explanation": "Connected organizations let entitlement management target a whole external org (by domain or tenant ID) as a pool of potential requestors, streamlining B2B access requests without pre-inviting every individual guest first. It doesn't merge tenants (B, which isn't a real capability), isn't a prerequisite for all Conditional Access policies (C, which is false and overly broad), and doesn't replace cross-tenant access settings, which serve a related but distinct trust-configuration purpose (D)."
+  },
+  {
+    "id": "q_d4_008",
+    "domain": "Plan and automate identity governance",
+    "subtopic": "catalogs",
+    "question": "Can a catalog owner (who is not a Global Administrator) create and manage access packages within their own catalog?",
+    "options": [
+      "No, only Global Administrators can ever touch entitlement management",
+      "Yes — catalog ownership is specifically designed to delegate access package creation and management within that catalog to non-Global-Admin resource owners",
+      "Only if the catalog owner is also assigned Exchange Administrator",
+      "Catalog owners can only view, never create or edit, access packages"
+    ],
+    "correctIndex": 1,
+    "explanation": "Delegated catalog ownership is a core entitlement management design goal — letting resource/business owners manage their own access packages without needing Global Administrator rights. It's not restricted to Global Admins only (A is false), doesn't require an unrelated Exchange Administrator role (C is false), and catalog owners have real create/edit capability, not just view access (D is false)."
+  },
+  {
+    "id": "q_d4_009",
+    "domain": "Plan and automate identity governance",
+    "subtopic": "access_packages",
+    "question": "An access package includes both an internal security group and a SharePoint site as resource roles. What happens when a user's access package assignment is approved?",
+    "options": [
+      "Only the SharePoint access is granted; group membership must be added manually afterward",
+      "The user is automatically granted membership/access to all resource roles bundled in the package (the group AND the SharePoint site) in one coordinated action",
+      "The user must separately request each resource one at a time even within the same package",
+      "Approval only sends a notification with no actual access granted"
+    ],
+    "correctIndex": 1,
+    "explanation": "The entire point of bundling multiple resource roles into one access package is that approval grants all of them together automatically, rather than requiring separate steps per resource. Manual follow-up for one resource (A), separate per-resource requests within a single package (C), and approval doing nothing but notify (D) all contradict how access packages are designed to work."
+  },
+  {
+    "id": "q_d4_010",
+    "domain": "Plan and automate identity governance",
+    "subtopic": "plan_entitlements",
+    "question": "Which licensing tier is generally required to use the full entitlement management feature set (catalogs, access packages, connected organizations)?",
+    "options": [
+      "No license is required; it's available on every free tenant",
+      "Microsoft Entra ID Governance (or Entra ID P2 for a subset of legacy-included capability, with full governance features requiring the dedicated Governance license/add-on)",
+      "Only Microsoft 365 E3, with no Entra-specific licensing needed",
+      "Only a Windows Server Datacenter license"
+    ],
+    "correctIndex": 1,
+    "explanation": "Full entitlement management capability sits under the Microsoft Entra ID Governance license (an add-on/SKU), with some overlap historically included in P2 — it isn't free-tier available (A is false), isn't unlocked purely by an M365 E3 license (C is false, since these are separate licensing product families), and has no connection to Windows Server Datacenter licensing (D is false)."
+  },
+  {
+    "id": "q_d4_011",
+    "domain": "Plan and automate identity governance",
+    "subtopic": "access_requests",
+    "question": "An access package requires a two-stage approval (manager, then resource owner). What happens if the manager rejects the request?",
+    "options": [
+      "The request automatically moves to stage two regardless of the manager's rejection",
+      "The request is denied and does not proceed to the resource owner approval stage",
+      "The user is granted access immediately since one approver responded",
+      "The rejection is ignored and access is granted after 24 hours automatically"
+    ],
+    "correctIndex": 1,
+    "explanation": "In a multi-stage approval flow, a rejection at any required stage stops the request — it does not proceed to the next stage (A is false) and certainly doesn't result in the user getting access anyway (C, D are both false and would defeat the purpose of requiring approval)."
+  },
+  {
+    "id": "q_d4_012",
+    "domain": "Plan and automate identity governance",
+    "subtopic": "external_user_lifecycle",
+    "question": "What access-package configuration option specifically helps prevent guest users from retaining access indefinitely after their sponsoring internal contact leaves the organization?",
+    "options": [
+      "Requiring re-approval/re-validation on a recurring basis (e.g., tied to expiration and requestor/sponsor validation), often paired with an access review of guest assignments",
+      "Company branding for guest accounts",
+      "Increasing the guest's assigned license tier",
+      "Changing the guest's UPN suffix"
+    ],
+    "correctIndex": 0,
+    "explanation": "Recurring expiration/re-approval requirements (and complementary access reviews) are the mechanism that catches orphaned guest access when the original sponsoring relationship ends. Branding (B), license tier changes (C), and UPN suffix changes (D) don't address this lifecycle risk at all."
+  },
+  {
+    "id": "q_d4_013",
+    "domain": "Plan and automate identity governance",
+    "subtopic": "terms_of_use",
+    "question": "Where in the access flow is a Terms of Use document typically enforced so a user must accept it before proceeding?",
+    "options": [
+      "As a grant control within a Conditional Access policy targeting the relevant app(s) or users",
+      "Only as an email sent after access is already granted",
+      "In the Company branding customization panel",
+      "As a mandatory field on the user's profile page with no enforcement mechanism"
+    ],
+    "correctIndex": 0,
+    "explanation": "Terms of use is enforced as a Conditional Access grant control, blocking access until the document is accepted — it's not merely a post-access email (B), unrelated to branding customization (C), and it's an actively enforced control, not a passive unenforced profile field (D)."
+  },
+  {
+    "id": "q_d4_014",
+    "domain": "Plan and automate identity governance",
+    "subtopic": "access_reviews_plan",
+    "question": "When planning access reviews for a large set of Microsoft 365 groups with mixed internal and guest membership, what is a key planning decision to reduce reviewer fatigue?",
+    "options": [
+      "Reviewing every group's entire membership manually, one person at a time, with no automation",
+      "Using intelligent recommendations (e.g., based on sign-in/usage activity) and scoping reviews appropriately (e.g., guest-only reviews vs. full membership reviews) to reduce the review burden and improve accuracy",
+      "Skipping access reviews entirely for groups with guests since they're too complex",
+      "Assigning every employee as a reviewer for every group"
+    ],
+    "correctIndex": 1,
+    "explanation": "Effective access review planning leverages built-in usage-based recommendations and appropriately scoped review targets (like guest-only reviews) to keep reviewer workload manageable and decisions well-informed. Fully manual review with no automation (A) doesn't scale, skipping guest reviews (C) ignores a common high-risk population, and assigning everyone as a reviewer for everything (D) creates unnecessary duplicated effort and fatigue."
+  },
+  {
+    "id": "q_d4_015",
+    "domain": "Plan and automate identity governance",
+    "subtopic": "access_reviews_create",
+    "question": "An admin creates a recurring quarterly access review for a security group, with the reviewer set to 'group owners' and auto-apply enabled for denied results. What happens to a member who is denied and not re-approved?",
+    "options": [
+      "Nothing happens until the admin manually removes them",
+      "The system automatically removes them from the group per the auto-apply setting once the review period ends with a deny decision",
+      "They are automatically promoted to group owner",
+      "The entire group is deleted"
+    ],
+    "correctIndex": 1,
+    "explanation": "With auto-apply enabled, denied access review outcomes are automatically enforced (removal from the group) without requiring a separate manual admin action — manual removal being required (A) describes the behavior WITHOUT auto-apply enabled. Denial obviously doesn't result in promotion (C) or group deletion (D), which are unrelated and disproportionate outcomes."
+  },
+  {
+    "id": "q_d4_016",
+    "domain": "Plan and automate identity governance",
+    "subtopic": "access_reviews_monitor",
+    "question": "Where would an admin check the current completion status and decision breakdown (approved/denied/no response) of an in-progress access review?",
+    "options": [
+      "The access review's own monitoring/insights view within Microsoft Entra ID Governance",
+      "Company branding analytics",
+      "The Azure Cost Management dashboard",
+      "Conditional Access sign-in logs"
+    ],
+    "correctIndex": 0,
+    "explanation": "Each access review has its own dashboard showing progress and decision breakdowns, the direct tool for this monitoring task. The other three options (branding analytics, cost management, CA sign-in logs) don't surface access review completion/decision data."
+  },
+  {
+    "id": "q_d4_017",
+    "domain": "Plan and automate identity governance",
+    "subtopic": "access_reviews_respond",
+    "question": "A reviewer is uncertain whether a specific guest user still needs access and wants a second opinion before deciding. What can they do within the access review experience?",
+    "options": [
+      "They must decide immediately with no way to defer or seek input",
+      "Some access review configurations allow forwarding a review decision to another reviewer, or the reviewer can otherwise consult offline before submitting their approve/deny decision within the review window",
+      "Automatically deny the user without any review",
+      "Delete the access review entirely"
+    ],
+    "correctIndex": 1,
+    "explanation": "Depending on configuration, reviewers can often delegate/forward specific decisions to someone better positioned to judge, and in general aren't forced to decide with zero ability to investigate first — being forced to decide immediately with no options (A) overstates the rigidity of the UX. Reflexively denying without any real review (C) defeats the review's purpose, and deleting the review (D) isn't an available per-decision action for an individual reviewer."
+  },
+  {
+    "id": "q_d4_018",
+    "domain": "Plan and automate identity governance",
+    "subtopic": "pim_entra_roles",
+    "question": "An organization wants administrators to hold the Global Administrator role only when actively performing admin tasks, not persistently, requiring justification and time-bound activation each time. What PIM configuration achieves this?",
+    "options": [
+      "Assign Global Administrator as a permanent active assignment to all admins",
+      "Assign Global Administrator as an eligible (not active) PIM role assignment, requiring the admin to activate it with justification for a limited time window when needed",
+      "Remove Global Administrator from everyone permanently with no path to use it",
+      "Use Company branding to restrict admin access"
+    ],
+    "correctIndex": 1,
+    "explanation": "PIM eligible assignments are exactly this — a role is 'available to activate' rather than always-on, requiring justification and expiring after a set duration, embodying just-in-time least privilege. Permanent active assignment (A) is the opposite of the goal, having no admin access path at all (C) would break necessary operations, and branding (D) has nothing to do with privileged access management."
+  },
+  {
+    "id": "q_d4_019",
+    "domain": "Plan and automate identity governance",
+    "subtopic": "pim_entra_roles",
+    "question": "In PIM role settings for Global Administrator, an admin enables 'Require approval to activate'. What is the effect on an eligible user trying to activate that role?",
+    "options": [
+      "The activation request goes to a designated approver who must approve it before the role becomes active for that user",
+      "Nothing changes; approval requirements are cosmetic only",
+      "The eligible user can no longer ever activate the role",
+      "The requirement only applies on weekends"
+    ],
+    "correctIndex": 0,
+    "explanation": "Requiring approval routes activation requests to designated approvers, adding a real human checkpoint before elevation takes effect — it's an enforced control, not cosmetic (B is false), doesn't permanently block activation (C is false, it just adds a gate), and isn't time-of-week limited (D is a fabricated restriction)."
+  },
+  {
+    "id": "q_d4_020",
+    "domain": "Plan and automate identity governance",
+    "subtopic": "pim_azure_resources",
+    "question": "How does PIM for Azure resources (e.g., Contributor role on a subscription) differ in scope from PIM for Microsoft Entra roles?",
+    "options": [
+      "There is no difference; they use the exact same role definitions",
+      "PIM for Azure resources manages just-in-time elevation for Azure RBAC roles (scoped to management groups, subscriptions, resource groups, or resources), while PIM for Entra roles manages just-in-time elevation for Microsoft Entra directory roles (like Global Administrator) — separate role systems with separate PIM configuration surfaces",
+      "PIM only supports Azure resources, never Entra directory roles",
+      "Azure resource PIM requires disabling Entra role PIM first"
+    ],
+    "correctIndex": 1,
+    "explanation": "Azure RBAC and Microsoft Entra directory roles are two distinct authorization systems, and PIM provides just-in-time elevation for each independently with its own configuration surface — they use different role definitions, not identical ones (A is false). PIM supports both systems, not just Azure resources (C is false), and there's no dependency requiring one to be disabled before configuring the other (D is false)."
+  },
+  {
+    "id": "q_d4_021",
+    "domain": "Plan and automate identity governance",
+    "subtopic": "pim_groups",
+    "question": "What does 'PIM for Groups' allow an organization to do?",
+    "options": [
+      "Make membership in (or ownership of) a specific Microsoft Entra group itself eligible/time-bound rather than permanent — useful when a group is used to grant access to an app or role, extending just-in-time principles to group-based access",
+      "Automatically delete groups with zero members",
+      "Rename groups in bulk",
+      "Apply Company branding per group"
+    ],
+    "correctIndex": 0,
+    "explanation": "PIM for Groups extends just-in-time, approval-gated, time-bound access to group membership/ownership itself — valuable when group membership is the actual mechanism granting sensitive access (like an app role or a role-assignable group). It's not an auto-cleanup tool for empty groups (B), a bulk-rename feature (C), or related to branding (D)."
+  },
+  {
+    "id": "q_d4_022",
+    "domain": "Plan and automate identity governance",
+    "subtopic": "pim_request_approval",
+    "question": "An eligible PIM user submits an activation request for a role requiring approval, but no approver responds within the configured request expiration window. What typically happens?",
+    "options": [
+      "The role activates automatically after expiration regardless of approval",
+      "The request expires without the role being activated, and the user must submit a new request",
+      "The requester is automatically made a permanent approver",
+      "The tenant automatically escalates to Global Administrator for everyone"
+    ],
+    "correctIndex": 1,
+    "explanation": "An unapproved request that hits its expiration window simply expires without granting access — PIM doesn't fail open and auto-activate on timeout (A is false), doesn't turn the requester into an approver (C, a fabricated and inappropriate outcome), and certainly doesn't escalate everyone to Global Administrator (D, a nonsensical response to an unapproved request)."
+  },
+  {
+    "id": "q_d4_023",
+    "domain": "Plan and automate identity governance",
+    "subtopic": "pim_audit_reports",
+    "question": "Which PIM feature would a security team use to investigate who activated a specific privileged role and when, over the past several months?",
+    "options": [
+      "PIM audit history, which logs role activations, assignments, and approval decisions over time",
+      "Company branding history",
+      "License assignment reports only",
+      "Custom security attribute definitions"
+    ],
+    "correctIndex": 0,
+    "explanation": "PIM audit history is the dedicated log of activation/assignment/approval events, exactly what's needed for this kind of historical investigation. Branding history (B) doesn't exist as a security log, license reports (C) don't cover role activation events, and custom attribute definitions (D) are unrelated metadata schema, not an activity log."
+  },
+  {
+    "id": "q_d4_024",
+    "domain": "Plan and automate identity governance",
+    "subtopic": "break_glass_accounts",
+    "question": "What is a best practice for the credentials and monitoring of break-glass emergency access accounts?",
+    "options": [
+      "Use the same password as a regular admin account for consistency",
+      "Use a very strong, unique, securely stored (e.g., physically split/sealed) credential not tied to MFA methods that could themselves fail, and configure high-priority alerting on any sign-in to these accounts",
+      "Store the password in an unencrypted shared spreadsheet accessible to all IT staff",
+      "Give break-glass accounts a normal, non-monitored user experience identical to standard accounts"
+    ],
+    "correctIndex": 1,
+    "explanation": "Break-glass accounts need strong, uniquely-stored credentials specifically designed to work even if normal MFA infrastructure is unavailable, combined with aggressive alerting since any use should be rare and noteworthy. Reusing another admin's password (A) undermines their independence, storing credentials in an unencrypted shared spreadsheet (C) is a serious security risk, and treating them identically to normal accounts with no special monitoring (D) defeats their emergency-access safety purpose."
+  },
+  {
+    "id": "q_d4_025",
+    "domain": "Plan and automate identity governance",
+    "subtopic": "pim_entra_roles",
+    "question": "Can a user have both an eligible AND an active PIM assignment for the same role simultaneously in different contexts (e.g., eligible tenant-wide, active for a specific administrative unit)?",
+    "options": [
+      "No, a user can only ever have one type of assignment for a role, period",
+      "Yes, PIM supports layering active and eligible assignments across different scopes for the same role, since scope (not just role) is part of the assignment",
+      "This is only possible for Global Administrator",
+      "PIM assignments cannot be scoped to administrative units at all"
+    ],
+    "correctIndex": 1,
+    "explanation": "PIM assignments are scoped, so a user can hold different assignment types (eligible vs active) for the same role across different scopes simultaneously — this isn't limited to a single assignment type per role globally (A is false), isn't restricted to Global Administrator specifically (C is false), and administrative-unit scoping for PIM-managed roles is indeed supported (D is false)."
+  },
+  {
+    "id": "q_d4_026",
+    "domain": "Plan and automate identity governance",
+    "subtopic": "monitor_logs_admin_center",
+    "question": "An admin needs to see exactly when a specific user's account was created and by whom. Which log in the Microsoft Entra admin center would they check?",
+    "options": [
+      "Sign-in logs",
+      "Audit logs",
+      "Provisioning logs",
+      "Usage & insights license report"
+    ],
+    "correctIndex": 1,
+    "explanation": "Audit logs record directory changes (like object creation, including who performed the action and when), which is exactly what's needed here. Sign-in logs (A) record authentication events, not object creation; provisioning logs (C) track automated app/HR-driven provisioning events specifically, not general directory changes; and license reports (D) don't cover account-creation history."
+  },
+  {
+    "id": "q_d4_027",
+    "domain": "Plan and automate identity governance",
+    "subtopic": "monitor_logs_admin_center",
+    "question": "A SaaS app has SCIM-based automatic provisioning configured, and a user reports they weren't created in the target app as expected. Which log should the admin check first to diagnose the provisioning failure?",
+    "options": [
+      "Sign-in logs",
+      "Provisioning logs, which show the detailed status (success/failure/skipped) and error detail of each SCIM provisioning cycle and per-user action",
+      "Audit logs only",
+      "Conditional Access 'What If' tool"
+    ],
+    "correctIndex": 1,
+    "explanation": "Provisioning logs are specifically built to show per-user, per-cycle SCIM provisioning outcomes and detailed failure reasons, making them the right first stop for this kind of issue. Sign-in logs (A) don't cover provisioning events, audit logs (C) log directory changes generally but with less provisioning-specific detail/context, and the 'What If' tool (D) is for Conditional Access simulation, unrelated to provisioning."
+  },
+  {
+    "id": "q_d4_028",
+    "domain": "Plan and automate identity governance",
+    "subtopic": "diagnostic_settings",
+    "question": "An organization wants to retain Microsoft Entra ID sign-in logs for 2 years for compliance, beyond the portal's default retention window. What should be configured?",
+    "options": [
+      "Nothing; the admin center automatically retains all logs indefinitely for free",
+      "Diagnostic settings streaming sign-in logs to a long-term destination such as a Log Analytics workspace, Azure Storage account, or Azure Event Hub",
+      "Company branding retention settings",
+      "Increasing the number of assigned licenses"
+    ],
+    "correctIndex": 1,
+    "explanation": "Diagnostic settings let you route Entra ID logs to durable, configurable-retention destinations like Log Analytics, Storage, or Event Hubs, which is required to retain data beyond the portal's own limited default window. Portal retention is not free-indefinite by default (A is false), branding settings have no log-retention capability (C), and license count doesn't affect log retention (D)."
+  },
+  {
+    "id": "q_d4_029",
+    "domain": "Plan and automate identity governance",
+    "subtopic": "diagnostic_settings",
+    "question": "Which of these is a valid diagnostic settings destination for Microsoft Entra ID logs?",
+    "options": [
+      "A Log Analytics workspace, an Azure Storage account, or an Azure Event Hub",
+      "A local file on the administrator's laptop only",
+      "A Company branding template",
+      "A Conditional Access named location"
+    ],
+    "correctIndex": 0,
+    "explanation": "Diagnostic settings support these three standard Azure destinations for streaming/archiving logs. A local laptop file (B) isn't a supported diagnostic settings destination, and branding templates (C) / named locations (D) aren't log destinations at all."
+  },
+  {
+    "id": "q_d4_030",
+    "domain": "Plan and automate identity governance",
+    "subtopic": "kql_log_analytics",
+    "question": "An admin wants to find all failed sign-ins from a specific country over the last 7 days, using Log Analytics. What should they use?",
+    "options": [
+      "A KQL (Kusto Query Language) query against the SigninLogs table in the Log Analytics workspace where diagnostic logs are being streamed",
+      "Company branding filters",
+      "A PIM audit history filter",
+      "Group-based licensing rules"
+    ],
+    "correctIndex": 0,
+    "explanation": "KQL queries against the SigninLogs table (once diagnostic settings route sign-in logs there) are the standard way to perform this kind of ad hoc, filtered log analysis. Branding filters (B), PIM audit history (C), and licensing rules (D) don't provide this querying capability over sign-in data."
+  },
+  {
+    "id": "q_d4_031",
+    "domain": "Plan and automate identity governance",
+    "subtopic": "workbooks_reporting",
+    "question": "What is the benefit of using Microsoft Entra ID Workbooks over writing ad hoc KQL queries every time?",
+    "options": [
+      "Workbooks are identical to raw KQL with no added value",
+      "Workbooks provide pre-built, reusable, often visual (charts/tables) reporting templates for common scenarios (like sign-in trends or risky sign-ins), which can also be customized, reducing the need to write a fresh query from scratch each time",
+      "Workbooks replace the need for any log data to be collected first",
+      "Workbooks can only be used by Global Administrators"
+    ],
+    "correctIndex": 1,
+    "explanation": "Workbooks package common analysis scenarios into reusable, visual templates that admins can use as-is or customize, saving time over always writing queries from scratch — they still rely on underlying log data being collected via diagnostic settings, they don't replace that requirement (C is false), aren't role-restricted to only Global Administrators among eligible viewers/editors (D is an overstatement), and clearly do add value beyond raw KQL (A is false)."
+  },
+  {
+    "id": "q_d4_032",
+    "domain": "Plan and automate identity governance",
+    "subtopic": "identity_secure_score",
+    "question": "What does Identity Secure Score measure, and how should an organization use it?",
+    "options": [
+      "It measures the tenant's Azure spend efficiency",
+      "It scores the organization's identity security posture against Microsoft's recommended best practices, with actionable improvement recommendations (e.g., 'enable MFA for all users') to prioritize hardening efforts",
+      "It measures how many custom branding templates exist",
+      "It is a measure of how many guest users have been invited"
+    ],
+    "correctIndex": 1,
+    "explanation": "Identity Secure Score benchmarks the tenant's configuration against Microsoft's security recommendations and gives prioritized, actionable improvement items — it has nothing to do with Azure spend (A), branding template count (C), or simply counting guest invitations (D)."
+  },
+  {
+    "id": "q_d4_033",
+    "domain": "Plan and automate identity governance",
+    "subtopic": "identity_secure_score",
+    "question": "An organization's Identity Secure Score flags 'Do not allow users to grant consent to unreliable applications' as an unaddressed recommendation. What action would resolve this specific recommendation?",
+    "options": [
+      "Restricting user consent settings so risky/unverified apps cannot be consented to by end users without going through admin review",
+      "Increasing the number of purchased licenses",
+      "Changing the tenant's default domain",
+      "Renaming all security groups"
+    ],
+    "correctIndex": 0,
+    "explanation": "That specific Secure Score recommendation maps directly to tightening user consent settings (restricting self-service consent for unverified/risky apps) — the other options (license count, default domain, group renaming) have no bearing on this consent-related recommendation."
+  },
+  {
+    "id": "q_d4_034",
+    "domain": "Plan and automate identity governance",
+    "subtopic": "pim_entra_roles",
+    "question": "What is the purpose of setting a maximum activation duration (e.g., 4 hours) on an eligible PIM role assignment?",
+    "options": [
+      "It limits how long the elevated privilege remains active once activated, automatically expiring the elevation and reducing the window of exposure if the session or credential were somehow compromised during that time",
+      "It sets how long the user has to submit the activation request itself",
+      "It determines how many times per year the role can be activated",
+      "It controls the tenant's default sign-in frequency for all users"
+    ],
+    "correctIndex": 0,
+    "explanation": "Maximum activation duration bounds how long the actual elevated access lasts once granted, directly limiting exposure time — it's not about the request submission window (B), an annual activation count cap (C), or a tenant-wide sign-in frequency setting (D, which is an unrelated Conditional Access session control)."
+  },
+  {
+    "id": "q_d4_035",
+    "domain": "Plan and automate identity governance",
+    "subtopic": "access_reviews_plan",
+    "question": "An organization wants access reviews to also cover Azure resource role assignments made via PIM (not just group/app access), reviewing whether privileged Azure roles are still needed. What supports this?",
+    "options": [
+      "Access reviews configured specifically for PIM-managed Azure resource roles, a distinct review target type from group/app membership reviews",
+      "Only Conditional Access, since access reviews cannot target PIM assignments",
+      "Company branding audits",
+      "License assignment reports"
+    ],
+    "correctIndex": 0,
+    "explanation": "Access reviews can specifically target PIM role assignments (both Entra roles and Azure resource roles), not just group or app membership, letting organizations periodically re-validate privileged access. Claiming access reviews can't target PIM at all (B) is false, and branding audits (C) / license reports (D) are unrelated to this governance capability."
+  },
+  {
+    "id": "q_d4_036",
+    "domain": "Plan and automate identity governance",
+    "subtopic": "pim_azure_resources",
+    "question": "A subscription Owner role is assigned via PIM as eligible with a requirement for Azure MFA on activation. What does this requirement enforce?",
+    "options": [
+      "Nothing extra beyond normal sign-in MFA already required elsewhere",
+      "The user must complete an additional MFA challenge specifically at the moment of activating the Owner role, even if they already satisfied MFA earlier in their session",
+      "MFA is only required once per year regardless of how often the role is activated",
+      "This setting has no effect unless Conditional Access is completely disabled"
+    ],
+    "correctIndex": 1,
+    "explanation": "PIM's 'require Azure MFA on activation' setting forces a fresh MFA challenge at the specific moment of privilege elevation, adding a deliberate extra checkpoint beyond whatever MFA already happened at sign-in. It's a real, enforced extra step, not a no-op (A is false), isn't limited to once-per-year (C, a fabricated cadence), and functions independently of whether Conditional Access is disabled (D is false)."
+  },
+  {
+    "id": "q_d4_037",
+    "domain": "Plan and automate identity governance",
+    "subtopic": "break_glass_accounts",
+    "question": "Why should break-glass accounts typically be excluded from Conditional Access policies that require Compliant Device or specific network location conditions?",
+    "options": [
+      "Because break-glass accounts don't need any protection at all",
+      "Because those conditions could themselves become unavailable or misconfigured during an actual emergency (e.g., device compliance service outage, network issue), and the whole point of a break-glass account is to remain usable precisely when normal access paths are failing",
+      "Because Conditional Access doesn't technically support break-glass accounts as a concept",
+      "Because excluding them improves the tenant's Identity Secure Score automatically"
+    ],
+    "correctIndex": 1,
+    "explanation": "The entire rationale for excluding break-glass accounts from certain restrictive conditions is resilience — they must work even when the normal control that's failing (like device compliance evaluation) is the very thing causing the emergency. It's not that they need no protection (A is false — they still need strong credentials and monitoring), Conditional Access has no technical block against targeting/excluding any account type including break-glass (C is false), and this exclusion isn't primarily a Secure-Score-boosting trick (D)."
+  },
+  {
+    "id": "q_d4_038",
+    "domain": "Plan and automate identity governance",
+    "subtopic": "monitor_logs_admin_center",
+    "question": "What information does the 'Conditional Access' details tab on an individual sign-in log entry provide?",
+    "options": [
+      "The user's password history",
+      "Which Conditional Access policies were evaluated for that specific sign-in and whether each one applied, was not applied, or resulted in the access decision (grant/block)",
+      "The user's assigned licenses only",
+      "The device's physical serial number"
+    ],
+    "correctIndex": 1,
+    "explanation": "That tab breaks down policy-by-policy evaluation results for the specific sign-in event, directly supporting Conditional Access troubleshooting. It doesn't show password history (A, which Entra ID never exposes this way), isn't just a license list (C), and doesn't surface device serial numbers (D)."
+  },
+  {
+    "id": "q_d4_039",
+    "domain": "Plan and automate identity governance",
+    "subtopic": "workbooks_reporting",
+    "question": "An admin wants a recurring visual dashboard showing MFA registration trends across the organization over the past 6 months, without writing a new query every time. What is the most appropriate tool?",
+    "options": [
+      "A saved/pinned Microsoft Entra ID Workbook built for MFA registration reporting, refreshed on demand or on a schedule",
+      "Manually exporting sign-in logs to Excel every day",
+      "Company branding settings",
+      "Custom security attribute definitions"
+    ],
+    "correctIndex": 0,
+    "explanation": "A workbook built for this purpose provides a reusable, visual, refreshable dashboard exactly matching the described need, without rewriting queries repeatedly. Manual daily Excel exports (B) is labor-intensive and error-prone by comparison, and branding settings (C) / custom attributes (D) have no reporting capability at all."
+  },
+  {
+    "id": "q_d4_040",
+    "domain": "Plan and automate identity governance",
+    "subtopic": "identity_secure_score",
+    "question": "How is an organization's Identity Secure Score percentage generally calculated?",
+    "options": [
+      "As a random number assigned by Microsoft support",
+      "As the ratio of achieved points (from completed security recommendations, each weighted by impact) to the total possible points across all applicable recommendations for that tenant",
+      "Purely based on the number of licensed users",
+      "Based solely on how many custom domains are verified"
+    ],
+    "correctIndex": 1,
+    "explanation": "Secure Score is a weighted, recommendation-based calculation — completed, applicable improvement actions contribute points toward a total possible score for that tenant's configuration. It isn't random (A), isn't based on user count (C), and isn't determined by domain verification count alone (D)."
+  }
+]
