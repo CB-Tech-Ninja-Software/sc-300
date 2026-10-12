@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sc300_prep/core/models/question.dart';
 import 'package:sc300_prep/core/models/flashcard.dart';
@@ -36,7 +38,35 @@ class AppDatabase {
   }
 
   Future<Database> _initDatabase({String dbName = 'sc300_prep.db'}) async {
-    final databasesPath = await getDatabasesPath();
+    // On desktop (Windows/Linux), sqflite_common_ffi's getDatabasesPath() defaults to a
+    // path relative to the process's current working directory -- not safe for an
+    // installed app, whose launch directory can vary (MSIX package folder, a shortcut's
+    // "Start in", etc). Use a stable, writable per-user app-support directory instead.
+    // Mobile (Android/iOS) keeps sqflite's own getDatabasesPath(), which is already correct.
+    final String databasesPath;
+    if (Platform.isWindows || Platform.isLinux) {
+      final supportDir = await getApplicationSupportDirectory();
+      databasesPath = supportDir.path;
+      
+      // Migration: if the old database file exists in the current working directory
+      // but the new one doesn't, copy it to the new location
+      final oldDbPath = p.join(await getDatabasesPath(), dbName);
+      final newDbPath = p.join(supportDir.path, dbName);
+      
+      final oldDbFile = File(oldDbPath);
+      final newDbFile = File(newDbPath);
+      
+      if (await oldDbFile.exists() && !await newDbFile.exists()) {
+        try {
+          await oldDbFile.copy(newDbPath);
+        } catch (e) {
+          // If migration fails, continue with the new location
+          // This is not a critical error for app functionality
+        }
+      }
+    } else {
+      databasesPath = await getDatabasesPath();
+    }
     final dbPath = p.join(databasesPath, dbName);
 
     return await openDatabase(
