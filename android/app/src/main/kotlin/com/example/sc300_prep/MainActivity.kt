@@ -1,4 +1,4 @@
-package com.example.sc300_prep
+package com.cbtechninja.sc300prep
 
 import io.flutter.embedding.android.FlutterActivity
 
